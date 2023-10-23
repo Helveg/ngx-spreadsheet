@@ -143,6 +143,5 @@
         }
       }
     }
-  },
-  "defaultProject": "ngx-smart-spreadsheet"
+  }
 }
