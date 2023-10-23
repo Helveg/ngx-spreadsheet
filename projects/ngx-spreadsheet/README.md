@@ -2,9 +2,9 @@
 Lightweight spreadsheet module for Angular
 
 [![npm](https://img.shields.io/npm/v/ngx-spreadsheet.svg)](https://www.npmjs.com/package/ngx-spreadsheet)
-[![GitHub license](https://img.shields.io/github/license/e-hirakawa/ngx-spreadsheet.svg)](https://github.com/e-hirakawa/ngx-spreadsheet)
+[![GitHub license](https://img.shields.io/github/license/helveg/ngx-spreadsheet.svg)](https://github.com/helveg/ngx-spreadsheet)
 [![npm](https://img.shields.io/bundlephobia/min/ngx-spreadsheet.svg)](https://www.npmjs.com/package/ngx-spreadsheet)
-[![npm total downloads](https://img.shields.io/npm/dt/ngx-spreadsheet.svg)](https://github.com/e-hirakawa/ngx-spreadsheet)
+[![npm total downloads](https://img.shields.io/npm/dt/ngx-spreadsheet.svg)](https://github.com/helveg/ngx-spreadsheet)
 
 # DEMO
 https://helveg.github.io/ngx-spreadsheet/
@@ -15,17 +15,14 @@ First, install this module in your project.
 $ npm install --save ngx-spreadsheet
 ```
 Import NgxSpreadsheetModule into your module.
-```javascript
+```ts
 import { NgxSpreadsheetModule } from 'ngx-spreadsheet';
 ...
 
 @NgModule({
-  ...
   imports: [
     NgxSpreadsheetModule,
-    ...
   ],
-  ...
 })
 export class AppModule { }
 ```
@@ -34,23 +31,17 @@ export class AppModule { }
 Now you can use the spreadsheet component in your app components, for example in app.component.ts:
 
 ## Example: Create an empty table with 3 rows x 6 columns
-```js
+```ts
 import { Component } from '@angular/core';
-import { SpreadsheetSettings } from 'ngx-spreadsheet';
 
 @Component({
   selector: 'app-root',
   template: `
-  <ngx-spreadsheet [settings]="settings">
+  <ngx-spreadsheet [rows]="3" [cols]="6">
   </ngx-spreadsheet>
   `
 })
-export class AppComponent {
-
-  // Spreadsheet initialization: Create an empty table with 3 rows x 6 columns
-  settings: SpreadsheetSettings = SpreadsheetSettings.empty(3, 6);
-
-}
+export class AppComponent {}
 ```
 
 or
@@ -58,19 +49,18 @@ or
 ## Example: Read A two-dimensional array
 ```js
 import { Component } from '@angular/core';
-import { SpreadsheetSettings } from 'ngx-spreadsheet';
 
 @Component({
   selector: 'app-root',
   template: `
-    <ngx-spreadsheet [settings]="settings">
+    <ngx-spreadsheet [data]="data">
     </ngx-spreadsheet>
   `
 })
 export class AppComponent {
 
   // Spreadsheet initialization: Read A two-dimensional array
-  settings: SpreadsheetSettings = SpreadsheetSettings.load([
+  data: string[][] = [
     ['Product ID', 'Product Category', 'Status', 'Price', 'Date'],
     ['PID1', 'Hat', 'Review', '2883', '"2021/8/9 20:25:05"'],
     ['PID2', 'Bag', 'Discard', '7336', '"2021/8/9 20:25:05"']
