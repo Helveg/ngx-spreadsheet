@@ -80,9 +80,10 @@ export class AppComponent {
 ```
 
 # Usage for read
+
 ```js
-import { Component } from '@angular/core';
-import { NgxSmartSpreadsheetComponent, SpreadsheetSettings } from 'ngx-smart-spreadsheet';
+import {Component} from '@angular/core';
+import {NgxSmartSpreadsheetComponent, SpreadsheetSettings} from 'ngx-smart-spreadsheet';
 
 @Component({
   selector: 'app-root',
@@ -102,7 +103,7 @@ export class AppComponent {
   ]);
 
   getData(nss: NgxSmartSpreadsheetComponent): void {
-    console.log(nss.data);
+    console.log(nss.data_);
   }
 
 }

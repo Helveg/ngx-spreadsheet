@@ -4,6 +4,7 @@ import { ContentEditableDirective } from './content-editable.directive';
 import { NgxContextMenuItemComponent } from './ngx-context-menu-item.component';
 import { NgxContextMenuComponent } from './ngx-context-menu.component';
 import { NgxSmartSpreadsheetComponent } from './ngx-smart-spreadsheet.component';
+import {LetDirective} from "@ngrx/component";
 
 
 
@@ -12,13 +13,9 @@ import { NgxSmartSpreadsheetComponent } from './ngx-smart-spreadsheet.component'
     NgxSmartSpreadsheetComponent,
     NgxContextMenuComponent,
     NgxContextMenuItemComponent,
-    ContentEditableDirective
+    ContentEditableDirective,
   ],
-  imports: [
-    CommonModule
-  ],
-  exports: [
-    NgxSmartSpreadsheetComponent
-  ]
+  imports: [CommonModule, LetDirective],
+  exports: [NgxSmartSpreadsheetComponent],
 })
-export class NgxSmartSpreadsheetModule { }
+export class NgxSmartSpreadsheetModule {}

@@ -21,7 +21,9 @@
     "@angular/platform-browser": "^16.2.10",
     "@angular/platform-browser-dynamic": "^16.2.10",
     "@angular/router": "^16.2.10",
+    "@ngrx/component": "^16.3.0",
     "rxjs": "~6.6.0",
+    "subjectize": "^0.2.3",
     "tslib": "^2.3.1",
     "zone.js": "~0.13.3"
   },
@@ -37,6 +39,7 @@
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
     "ng-packagr": "^16.2.3",
+    "prettier": "^3.0.3",
     "typescript": "~5.1.6"
   },
   "keywords": [

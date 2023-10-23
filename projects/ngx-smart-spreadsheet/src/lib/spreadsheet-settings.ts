@@ -1,4 +1,4 @@
-import { mergeDeep } from "./deep-marge";
+import { mergeDeep } from "./deep-merge";
 import { SpreadsheetSettingOptions } from "./spreadsheet-settings-options";
 
 const defaultOptions: SpreadsheetSettingOptions = {

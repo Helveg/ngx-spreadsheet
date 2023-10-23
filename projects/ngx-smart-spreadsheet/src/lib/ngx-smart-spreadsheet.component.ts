@@ -1,4 +1,12 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import csvToArray from './csv-converter';
 import Anchor from './model/anchor';
 import Cell from './model/cell';
@@ -6,20 +14,61 @@ import Range from './model/range';
 import Table from './model/table';
 import { NgxContextMenuComponent } from './ngx-context-menu.component';
 import { SpreadsheetSettings } from './spreadsheet-settings';
+import { Subjectize } from 'subjectize';
+import { merge, Observable, ReplaySubject } from 'rxjs';
+import {
+  distinctUntilChanged,
+  filter,
+  map,
+  scan,
+  shareReplay,
+  startWith,
+  withLatestFrom,
+} from 'rxjs/operators';
 
 @Component({
   selector: 'ngx-smart-spreadsheet',
   templateUrl: './ngx-smart-spreadsheet.component.html',
-  styleUrls: ['./ngx-smart-spreadsheet.component.scss']
+  styleUrls: ['./ngx-smart-spreadsheet.component.scss'],
 })
-export class NgxSmartSpreadsheetComponent implements OnInit {
+export class NgxSmartSpreadsheetComponent {
   @ViewChild('theadMenu')
   theadContextMenu!: NgxContextMenuComponent;
   @ViewChild('tbodyMenu')
   tbodyContextMenu!: NgxContextMenuComponent;
 
-  @Input()
-  settings: SpreadsheetSettings | null = null;
+  @Input() data: any[][] | null = null;
+  @Input() rows: number | null = null;
+  @Input() cols: number | null = null;
+  @Subjectize('data') data$ = new ReplaySubject<any[][]>(1);
+  @Subjectize('rows') _rows$ = new ReplaySubject<number>(1);
+  @Subjectize('cols') _cols$ = new ReplaySubject<number>(1);
+  rows$ = this._rows$.pipe(
+    startWith(3),
+    scan((acc, value) => value ?? acc, 3),
+  );
+  cols$ = this._cols$.pipe(
+    startWith(3),
+    scan((acc, value) => value ?? acc, 3),
+  );
+  table$ = merge(
+    this.data$.pipe(
+      withLatestFrom(this.rows$, this.cols$),
+      map(
+        ([data, rows, cols]) =>
+          () =>
+            data ? Table.load(data) : Table.empty(rows, cols),
+      ),
+    ),
+    this.rows$.pipe(map((rows) => (table: Table) => table.resize({ rows }))),
+    this.cols$.pipe(map((cols) => (table: Table) => table.resize({ cols }))),
+  ).pipe(
+    scan(
+      (table, modifier: (table: Table) => Table | void) =>
+        (this.table = modifier(table) ?? table),
+      Table.empty(3, 3),
+    ),
+  );
 
   @Output()
   copied = new EventEmitter<string>();
@@ -32,25 +81,18 @@ export class NgxSmartSpreadsheetComponent implements OnInit {
   activeTheadIndex: number = -1;
   activeTbodyIndex: number = -1;
 
-  ngOnInit(): void {
-    if (this.settings?.rows && this.settings?.cols) {
-      this.table = Table.empty(this.settings.rows, this.settings.cols);
-    } else if (this.settings?.data) {
-      this.table = Table.load(this.settings.data);
-    }
-  }
-
-  public get data(): string[][] {
-    if (!this.table) {
-      return [[]];
-    }
-    return this.table.body.map(row => row.map(cell => cell.value));
+  constructor() {
+    this.rows$.subscribe((v) => console.log('rows?', v));
+    this.cols$.subscribe((v) => console.log('cols?', v));
+    this.data$.subscribe((v) => console.log('data?', v));
   }
 
   @HostListener('mousedown', ['$event'])
   private mousedown(ev: MouseEvent): void {
+    console.log('mousedown');
     const { row, col, valid } = this.getPositionFromId(ev.target);
     if (!valid) {
+      console.log('cell not valid', row, col, valid);
       return;
     }
     this.range = Range.of(row, col);
@@ -90,7 +132,7 @@ export class NgxSmartSpreadsheetComponent implements OnInit {
   @HostListener('document:keydown', ['$event'])
   private onKeyDown(ev: KeyboardEvent): void {
     const key = ev.key.toLowerCase();
-    const isCtrl = ((ev.ctrlKey && !ev.metaKey) || (!ev.ctrlKey && ev.metaKey));
+    const isCtrl = (ev.ctrlKey && !ev.metaKey) || (!ev.ctrlKey && ev.metaKey);
     if (!this.table) {
       return;
     }
@@ -219,9 +261,15 @@ export class NgxSmartSpreadsheetComponent implements OnInit {
     ev.stopPropagation();
     this.tbodyContextMenu.show(ev, index);
   }
+
   //#endregion
 
-  private moveTo(row: number, col: number, shiftKey: boolean, editable: boolean): void {
+  private moveTo(
+    row: number,
+    col: number,
+    shiftKey: boolean,
+    editable: boolean,
+  ): void {
     if (!this.table) {
       return;
     }
@@ -254,14 +302,19 @@ export class NgxSmartSpreadsheetComponent implements OnInit {
 
   private findCellByEventTarget(target: EventTarget | null): Cell | null {
     const { row, col, valid } = this.getPositionFromId(target);
-    return valid ? (this.table?.findCell(row, col) || null) : null;
+    return valid ? this.table?.findCell(row, col) || null : null;
   }
 
-  private getPositionFromId(target: EventTarget | null): { row: number, col: number, valid: boolean } {
+  private getPositionFromId(target: EventTarget | null): {
+    row: number;
+    col: number;
+    valid: boolean;
+  } {
     const element = target as HTMLTableCellElement;
     if (!this.table || !element?.id?.match(/(\w+)-(\d+)-(\d+)/)) {
       return { row: NaN, col: NaN, valid: false };
     }
+    console.log(this.table);
     const valid = RegExp.$1 === this.table.id;
     const row = parseInt(RegExp.$2 || '', 10);
     const col = parseInt(RegExp.$3 || '', 10);
@@ -278,7 +331,7 @@ export class NgxSmartSpreadsheetComponent implements OnInit {
       for (let c = this.range.c1; c <= this.range.c2; c++) {
         const cell = this.table.findCell(r, c);
         if (cell) {
-          const value = (cell.value.match(/[\t\n\r　 "]+/))
+          const value = cell.value.match(/[\t\n\r　 "]+/)
             ? '"' + cell.value.split('"').join('""') + '"'
             : cell.value;
           line.push(value);
@@ -288,8 +341,7 @@ export class NgxSmartSpreadsheetComponent implements OnInit {
     }
     const text = lines.join('\n');
     if (text) {
-      navigator.clipboard.writeText(text)
-        .then(() => this.copied.emit(text));
+      navigator.clipboard.writeText(text).then(() => this.copied.emit(text));
     }
   }
 
@@ -298,48 +350,47 @@ export class NgxSmartSpreadsheetComponent implements OnInit {
       return;
     }
     const { r1, c1, r2, c2 } = this.range;
-    navigator.clipboard.readText()
-      .then((data) => {
-        const ar = csvToArray(data);
-        if (!ar.length) {
-          return;
-        }
-        if (ar.length === 1 && ar[0].length === 1) {
-          const clipboardText = ar[0][0];
-          for (let r = r1; r <= r2; r++) {
-            for (let c = c1; c <= c2; c++) {
-              const cell = this.table!.findCell(r, c);
-              if (cell) {
-                cell.value = clipboardText;
-              }
+    navigator.clipboard.readText().then((data) => {
+      const ar = csvToArray(data);
+      if (!ar.length) {
+        return;
+      }
+      if (ar.length === 1 && ar[0].length === 1) {
+        const clipboardText = ar[0][0];
+        for (let r = r1; r <= r2; r++) {
+          for (let c = c1; c <= c2; c++) {
+            const cell = this.table!.findCell(r, c);
+            if (cell) {
+              cell.value = clipboardText;
             }
-          }
-        } else if ((r2 - r1 + 1) === ar.length && (c2 - c1 + 1) === ar[0].length) {
-          for (let r = r1; r <= r2; r++) {
-            for (let c = c1; c <= c2; c++) {
-              const cell = this.table!.findCell(r, c);
-              if (cell) {
-                cell.value = ar[r][c];
-              }
-            }
-          }
-        } else {
-          let cell = null;
-          for (let r = 0, tableRow = r1; r < ar.length; r++, tableRow++) {
-            const row = ar[r];
-            for (let c = 0, tableCol = c1; c < row.length; c++, tableCol++) {
-              const col = row[c];
-              cell = this.table!.findCell(tableRow, tableCol);
-              if (cell) {
-                cell.value = col;
-              }
-            }
-          }
-          if (cell) {
-            this.range = Range.of(r1, c1, cell.row, cell.col);
           }
         }
-      });
+      } else if (r2 - r1 + 1 === ar.length && c2 - c1 + 1 === ar[0].length) {
+        for (let r = r1; r <= r2; r++) {
+          for (let c = c1; c <= c2; c++) {
+            const cell = this.table!.findCell(r, c);
+            if (cell) {
+              cell.value = ar[r][c];
+            }
+          }
+        }
+      } else {
+        let cell = null;
+        for (let r = 0, tableRow = r1; r < ar.length; r++, tableRow++) {
+          const row = ar[r];
+          for (let c = 0, tableCol = c1; c < row.length; c++, tableCol++) {
+            const col = row[c];
+            cell = this.table!.findCell(tableRow, tableCol);
+            if (cell) {
+              cell.value = col;
+            }
+          }
+        }
+        if (cell) {
+          this.range = Range.of(r1, c1, cell.row, cell.col);
+        }
+      }
+    });
   }
 
   private delete(): void {
@@ -356,5 +407,4 @@ export class NgxSmartSpreadsheetComponent implements OnInit {
       }
     }
   }
-
 }
