@@ -64,7 +64,7 @@ export class AppComponent {
     ['Product ID', 'Product Category', 'Status', 'Price', 'Date'],
     ['PID1', 'Hat', 'Review', '2883', '"2021/8/9 20:25:05"'],
     ['PID2', 'Bag', 'Discard', '7336', '"2021/8/9 20:25:05"']
-  ]);
+  ];
 
 }
 ```

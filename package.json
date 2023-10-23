@@ -8,7 +8,7 @@
     "publish": "npm run build && npm publish dist/ngx-spreadsheet",
     "build:example": "ng build example",
     "watch": "ng build ngx-spreadsheet --watch --configuration development",
-    "ghpages": "ng build example --configuration production --base-href \"https://helveg.github.io/ngx-spreadsheet/\" && ngh --dir=dist/example",
+    "ghpages": "rimraf dist/example && ng build example --configuration production --base-href \"https://helveg.github.io/ngx-spreadsheet/\" && ngh --dir=dist/example",
     "test": "ng test"
   },
   "private": true,
@@ -41,6 +41,7 @@
     "karma-jasmine-html-reporter": "~1.7.0",
     "ng-packagr": "^16.2.3",
     "prettier": "^3.0.3",
+    "rimraf": "^5.0.5",
     "typescript": "~5.1.6"
   },
   "keywords": [
