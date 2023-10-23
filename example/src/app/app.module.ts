@@ -1,23 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { NgxSmartSpreadsheetModule } from 'ngx-smart-spreadsheet';
+import { NgxSpreadsheetModule } from 'ngx-spreadsheet';
 import { AppComponent } from './app.component';
 
-
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    CommonModule,
-    BrowserModule,
-    NgxSmartSpreadsheetModule
-  ],
-  exports: [
-    NgxSmartSpreadsheetModule
-  ],
+  declarations: [AppComponent],
+  imports: [CommonModule, BrowserModule, NgxSpreadsheetModule],
+  exports: [NgxSpreadsheetModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

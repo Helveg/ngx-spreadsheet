@@ -1,28 +1,28 @@
 # NgxSmartSpreadsheet
 Lightweight spreadsheet module for Angular
 
-[![npm](https://img.shields.io/npm/v/ngx-smart-spreadsheet.svg)](https://www.npmjs.com/package/ngx-smart-spreadsheet)
-[![GitHub license](https://img.shields.io/github/license/e-hirakawa/ngx-smart-spreadsheet.svg)](https://github.com/e-hirakawa/ngx-smart-spreadsheet)
-[![npm](https://img.shields.io/bundlephobia/min/ngx-smart-spreadsheet.svg)](https://www.npmjs.com/package/ngx-smart-spreadsheet)
-[![npm total downloads](https://img.shields.io/npm/dt/ngx-smart-spreadsheet.svg)](https://github.com/e-hirakawa/ngx-smart-spreadsheet)
+[![npm](https://img.shields.io/npm/v/ngx-spreadsheet.svg)](https://www.npmjs.com/package/ngx-spreadsheet)
+[![GitHub license](https://img.shields.io/github/license/e-hirakawa/ngx-spreadsheet.svg)](https://github.com/e-hirakawa/ngx-spreadsheet)
+[![npm](https://img.shields.io/bundlephobia/min/ngx-spreadsheet.svg)](https://www.npmjs.com/package/ngx-spreadsheet)
+[![npm total downloads](https://img.shields.io/npm/dt/ngx-spreadsheet.svg)](https://github.com/e-hirakawa/ngx-spreadsheet)
 
 # DEMO
-https://e-hirakawa.github.io/ngx-smart-spreadsheet/
+https://helveg.github.io/ngx-spreadsheet/
 
 # Installation
 First, install this module in your project.
 ```console
-$ npm install --save ngx-smart-spreadsheet
+$ npm install --save ngx-spreadsheet
 ```
-Import NgxSmartSpreadsheetModule into your module.
+Import NgxSpreadsheetModule into your module.
 ```javascript
-import { NgxSmartSpreadsheetModule } from 'ngx-smart-spreadsheet';
+import { NgxSpreadsheetModule } from 'ngx-spreadsheet';
 ...
 
 @NgModule({
   ...
   imports: [
-    NgxSmartSpreadsheetModule,
+    NgxSpreadsheetModule,
     ...
   ],
   ...
@@ -36,13 +36,13 @@ Now you can use the spreadsheet component in your app components, for example in
 ## Example: Create an empty table with 3 rows x 6 columns
 ```js
 import { Component } from '@angular/core';
-import { SpreadsheetSettings } from 'ngx-smart-spreadsheet';
+import { SpreadsheetSettings } from 'ngx-spreadsheet';
 
 @Component({
   selector: 'app-root',
   template: `
-  <ngx-smart-spreadsheet [settings]="settings">
-  </ngx-smart-spreadsheet>
+  <ngx-spreadsheet [settings]="settings">
+  </ngx-spreadsheet>
   `
 })
 export class AppComponent {
@@ -58,13 +58,13 @@ or
 ## Example: Read A two-dimensional array
 ```js
 import { Component } from '@angular/core';
-import { SpreadsheetSettings } from 'ngx-smart-spreadsheet';
+import { SpreadsheetSettings } from 'ngx-spreadsheet';
 
 @Component({
   selector: 'app-root',
   template: `
-    <ngx-smart-spreadsheet [settings]="settings">
-    </ngx-smart-spreadsheet>
+    <ngx-spreadsheet [settings]="settings">
+    </ngx-spreadsheet>
   `
 })
 export class AppComponent {
@@ -83,13 +83,13 @@ export class AppComponent {
 
 ```js
 import {Component} from '@angular/core';
-import {NgxSmartSpreadsheetComponent, SpreadsheetSettings} from 'ngx-smart-spreadsheet';
+import {NgxSpreadsheetComponent, SpreadsheetSettings} from 'ngx-spreadsheet';
 
 @Component({
   selector: 'app-root',
   template: `
-    <ngx-smart-spreadsheet [settings]="settings">
-    </ngx-smart-spreadsheet>
+    <ngx-spreadsheet [settings]="settings">
+    </ngx-spreadsheet>
     <button (click)="getData(nss)">Get data</button>
   `
 })
@@ -102,7 +102,7 @@ export class AppComponent {
     ['PID2', 'Bag', 'Discard', '7336', '"2021/8/9 20:25:05"']
   ]);
 
-  getData(nss: NgxSmartSpreadsheetComponent): void {
+  getData(nss: NgxSpreadsheetComponent): void {
     console.log(nss.data_);
   }
 
@@ -112,13 +112,13 @@ export class AppComponent {
 # i18n of context menu
 ```js
 import { Component } from '@angular/core';
-import { SpreadsheetSettings } from 'ngx-smart-spreadsheet';
+import { SpreadsheetSettings } from 'ngx-spreadsheet';
 
 @Component({
   selector: 'app-root',
   template: `
-    <ngx-smart-spreadsheet [settings]="settings">
-    </ngx-smart-spreadsheet>
+    <ngx-spreadsheet [settings]="settings">
+    </ngx-spreadsheet>
   `
 })
 export class AppComponent {

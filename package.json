@@ -1,14 +1,14 @@
 {
-  "name": "ngx-smart-spreadsheet",
+  "name": "ngx-spreadsheet",
   "version": "0.2.5",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build ngx-smart-spreadsheet",
-    "publish": "npm run build && npm publish dist/ngx-smart-spreadsheet",
+    "build": "ng build ngx-spreadsheet",
+    "publish": "npm run build && npm publish dist/ngx-spreadsheet",
     "build:example": "ng build example",
-    "watch": "ng build ngx-smart-spreadsheet --watch --configuration development",
-    "ghpages": "ng build example --prod --base-href \"https://e-hirakawa.github.io/ngx-smart-spreadsheet/\" && ngh --dir=dist/example",
+    "watch": "ng build ngx-spreadsheet --watch --configuration development",
+    "ghpages": "ng build example --configuration production --base-href \"https://helveg.github.io/ngx-spreadsheet/\" && ngh --dir=dist/example",
     "test": "ng test"
   },
   "private": true,
@@ -32,6 +32,7 @@
     "@angular/cli": "^16.2.7",
     "@angular/compiler-cli": "^16.2.10",
     "@types/jasmine": "~3.8.0",
+    "angular-cli-ghpages": "^1.0.7",
     "jasmine-core": "~3.8.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",
@@ -50,7 +51,7 @@
   "author": "Eiji Hirakawa",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/e-hirakawa/ngx-smart-spreadsheet"
+    "url": "https://github.com/e-hirakawa/ngx-spreadsheet"
   },
-  "homepage": "https://github.com/e-hirakawa/ngx-smart-spreadsheet#readme"
+  "homepage": "https://github.com/e-hirakawa/ngx-spreadsheet#readme"
 }

@@ -12,8 +12,8 @@
     "declaration": false,
     "downlevelIteration": true,
     "paths": {
-      "ngx-smart-spreadsheet": [
-        "dist/ngx-smart-spreadsheet"
+      "ngx-spreadsheet": [
+        "dist/ngx-spreadsheet"
       ]
     },
     "experimentalDecorators": true,

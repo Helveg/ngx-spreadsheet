@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { SpreadsheetSettings } from 'ngx-smart-spreadsheet';
+import { SpreadsheetSettings } from 'ngx-spreadsheet';
 
 @Component({
   selector: 'app-root',
@@ -10,29 +10,27 @@ import { SpreadsheetSettings } from 'ngx-smart-spreadsheet';
       Lightweight spreadsheet for Angular
     </h1>
     <div class="info">
-      <a href="https://www.npmjs.com/package/ngx-smart-spreadsheet">
+      <a href="https://www.npmjs.com/package/ngx-spreadsheet">
         <img
-          src="https://img.shields.io/npm/v/ngx-smart-spreadsheet.svg"
+          src="https://img.shields.io/npm/v/ngx-spreadsheet.svg"
           alt="npm version"
         />
       </a>
-      <a
-        href="https://github.com/e-hirakawa/ngx-smart-spreadsheet/blob/main/LICENSE"
-      >
+      <a href="https://github.com/e-hirakawa/ngx-spreadsheet/blob/main/LICENSE">
         <img
-          src="https://img.shields.io/github/license/e-hirakawa/ngx-smart-spreadsheet.svg"
+          src="https://img.shields.io/github/license/e-hirakawa/ngx-spreadsheet.svg"
           alt="license"
         />
       </a>
-      <a href="https://github.com/e-hirakawa/ngx-smart-spreadsheet">
+      <a href="https://github.com/e-hirakawa/ngx-spreadsheet">
         <img
-          src="https://img.shields.io/bundlephobia/min/ngx-smart-spreadsheet.svg"
+          src="https://img.shields.io/bundlephobia/min/ngx-spreadsheet.svg"
           alt="minified size"
         />
       </a>
-      <a href="https://www.npmjs.com/package/ngx-smart-spreadsheet">
+      <a href="https://www.npmjs.com/package/ngx-spreadsheet">
         <img
-          src="https://img.shields.io/npm/dt/ngx-smart-spreadsheet.svg"
+          src="https://img.shields.io/npm/dt/ngx-spreadsheet.svg"
           alt="downloads"
         />
       </a>
@@ -65,11 +63,11 @@ import { SpreadsheetSettings } from 'ngx-smart-spreadsheet';
       <div class="divider"></div>
       <button (click)="createDummy()">Create dummy table</button>
     </div>
-    <ngx-smart-spreadsheet
+    <ngx-spreadsheet
       [rows]="rows"
       [cols]="cols"
       [data]="data"
-    ></ngx-smart-spreadsheet>
+    ></ngx-spreadsheet>
   `,
   styles: [
     'h1 { color: #666; display: inline-flex; align-items: center;}',

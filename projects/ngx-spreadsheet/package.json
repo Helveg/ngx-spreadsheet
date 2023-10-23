@@ -1,5 +1,5 @@
 {
-  "name": "ngx-smart-spreadsheet",
+  "name": "ngx-spreadsheet",
   "version": "0.2.5",
   "peerDependencies": {
     "@angular/common": "^13 || ^14 || ^15 || ^16",
@@ -13,10 +13,10 @@
     "Spreadsheet",
     "Lightweight"
   ],
-  "author": "Eiji Hirakawa",
+  "author": "Robin De Schepper",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/e-hirakawa/ngx-smart-spreadsheet"
+    "url": "https://github.com/helveg/ngx-spreadsheet"
   },
-  "homepage": "https://github.com/e-hirakawa/ngx-smart-spreadsheet#readme"
+  "homepage": "https://github.com/helveg/ngx-spreadsheet#readme"
 }

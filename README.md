@@ -1,1 +1,1 @@
-projects/ngx-smart-spreadsheet/README.md
+projects/ngx-spreadsheet/README.md

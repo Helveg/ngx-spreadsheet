@@ -6,23 +6,23 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ngx-smart-spreadsheet": {
+    "ngx-spreadsheet": {
       "projectType": "library",
-      "root": "projects/ngx-smart-spreadsheet",
-      "sourceRoot": "projects/ngx-smart-spreadsheet/src",
+      "root": "projects/ngx-spreadsheet",
+      "sourceRoot": "projects/ngx-spreadsheet/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/ngx-smart-spreadsheet/ng-package.json"
+            "project": "projects/ngx-spreadsheet/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/ngx-smart-spreadsheet/tsconfig.lib.prod.json"
+              "tsConfig": "projects/ngx-spreadsheet/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/ngx-smart-spreadsheet/tsconfig.lib.json"
+              "tsConfig": "projects/ngx-spreadsheet/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -30,9 +30,9 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/ngx-smart-spreadsheet/src/test.ts",
-            "tsConfig": "projects/ngx-smart-spreadsheet/tsconfig.spec.json",
-            "karmaConfig": "projects/ngx-smart-spreadsheet/karma.conf.js"
+            "main": "projects/ngx-spreadsheet/src/test.ts",
+            "tsConfig": "projects/ngx-spreadsheet/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-spreadsheet/karma.conf.js"
           }
         }
       }

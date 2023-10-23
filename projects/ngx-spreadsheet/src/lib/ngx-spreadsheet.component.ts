@@ -27,11 +27,11 @@ import {
 } from 'rxjs/operators';
 
 @Component({
-  selector: 'ngx-smart-spreadsheet',
-  templateUrl: './ngx-smart-spreadsheet.component.html',
-  styleUrls: ['./ngx-smart-spreadsheet.component.scss'],
+  selector: 'ngx-spreadsheet',
+  templateUrl: './ngx-spreadsheet.component.html',
+  styleUrls: ['./ngx-spreadsheet.component.scss'],
 })
-export class NgxSmartSpreadsheetComponent {
+export class NgxSpreadsheetComponent {
   @ViewChild('theadMenu')
   theadContextMenu!: NgxContextMenuComponent;
   @ViewChild('tbodyMenu')
@@ -80,12 +80,6 @@ export class NgxSmartSpreadsheetComponent {
 
   activeTheadIndex: number = -1;
   activeTbodyIndex: number = -1;
-
-  constructor() {
-    this.rows$.subscribe((v) => console.log('rows?', v));
-    this.cols$.subscribe((v) => console.log('cols?', v));
-    this.data$.subscribe((v) => console.log('data?', v));
-  }
 
   @HostListener('mousedown', ['$event'])
   private mousedown(ev: MouseEvent): void {
