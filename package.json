@@ -24,6 +24,7 @@
     "@ngrx/component": "^16.3.0",
     "rxjs": "~6.6.0",
     "subjectize": "^0.2.3",
+    "ts-deepmerge": "^6.2.0",
     "tslib": "^2.3.1",
     "zone.js": "~0.13.3"
   },
