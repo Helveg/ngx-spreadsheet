@@ -1,8 +1,8 @@
-import generateHeader from '../header-index-generator';
-import generateId from '../id-generator';
-import Cell from './cell';
+import { Cell } from './cell';
+import { generateHeader } from '../header-index-generator';
+import { generateId } from '../id-generator';
 
-class Table {
+export class Table {
   constructor(
     public id: string,
     public head: string[],
@@ -54,6 +54,32 @@ class Table {
       }
     }
     return null;
+  }
+
+  public findOrCreateCell(row: number, col: number): Cell {
+    for (const record of this.body) {
+      for (const field of record) {
+        if (field.row === row && field.col === col) {
+          return field;
+        }
+      }
+    }
+    const resize: { rows?: number; cols?: number } = {};
+    console.log(this.rowCount, row, this.colCount, col);
+    if (this.rowCount <= row) {
+      resize.rows = row + 1;
+    }
+    if (this.colCount <= col) {
+      resize.cols = col + 1;
+    }
+    this.resize(resize);
+    const cell = this.findCell(row, col);
+    if (!cell) {
+      throw new Error(
+        `Unknown table error, could not find or create (${row}, ${col})`,
+      );
+    }
+    return cell;
   }
 
   public insertColumn(colIndex: number): void {
@@ -143,5 +169,3 @@ class Table {
     }
   }
 }
-
-export default Table;

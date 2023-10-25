@@ -3,28 +3,21 @@ import {
   EventEmitter,
   HostListener,
   Input,
-  OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
-import csvToArray from './csv-converter';
-import Anchor from './model/anchor';
-import Cell from './model/cell';
-import Range from './model/range';
-import Table from './model/table';
 import { NgxContextMenuComponent } from './ngx-context-menu.component';
-import { SpreadsheetSettings } from './spreadsheet-settings';
 import { Subjectize } from 'subjectize';
-import { merge, Observable, ReplaySubject } from 'rxjs';
+import { merge, ReplaySubject } from 'rxjs';
 import {
   distinctUntilChanged,
-  filter,
   map,
   scan,
-  shareReplay,
   startWith,
   withLatestFrom,
 } from 'rxjs/operators';
+import { csvToArray } from './csv-converter';
+import { Anchor, Cell, Range, Table } from './model';
 
 @Component({
   selector: 'ngx-spreadsheet',
@@ -51,23 +44,37 @@ export class NgxSpreadsheetComponent {
     startWith(3),
     scan((acc, value) => value ?? acc, 3),
   );
+  /**
+   * The table observable integrates all the reactive pipes into a higher order scan that
+   * can mutate or replace the table reference.
+   */
   table$ = merge(
+    // Data object reference changed, create new table based on data
     this.data$.pipe(
       withLatestFrom(this.rows$, this.cols$),
       map(
         ([data, rows, cols]) =>
           () =>
+            // If data is set to null, create blank table of same size
             data ? Table.load(data) : Table.empty(rows, cols),
       ),
     ),
+    // Row input changed, resize table
     this.rows$.pipe(map((rows) => (table: Table) => table.resize({ rows }))),
+    // Col input changed, resize table
     this.cols$.pipe(map((cols) => (table: Table) => table.resize({ cols }))),
   ).pipe(
     scan(
-      (table, modifier: (table: Table) => Table | void) =>
-        (this.table = modifier(table) ?? table),
+      (table, modifier: (table: Table) => Table | void) => {
+        table = modifier(table) ?? table;
+        if (table !== this.table) {
+          this.table = table;
+        }
+        return table;
+      },
       Table.empty(3, 3),
     ),
+    distinctUntilChanged(),
   );
 
   @Output()
@@ -308,7 +315,6 @@ export class NgxSpreadsheetComponent {
     if (!this.table || !element?.id?.match(/(\w+)-(\d+)-(\d+)/)) {
       return { row: NaN, col: NaN, valid: false };
     }
-    console.log(this.table);
     const valid = RegExp.$1 === this.table.id;
     const row = parseInt(RegExp.$2 || '', 10);
     const col = parseInt(RegExp.$3 || '', 10);
@@ -350,6 +356,7 @@ export class NgxSpreadsheetComponent {
         return;
       }
       if (ar.length === 1 && ar[0].length === 1) {
+        // There is only 1 pasted value, paste it everywhere
         const clipboardText = ar[0][0];
         for (let r = r1; r <= r2; r++) {
           for (let c = c1; c <= c2; c++) {
@@ -359,30 +366,23 @@ export class NgxSpreadsheetComponent {
             }
           }
         }
-      } else if (r2 - r1 + 1 === ar.length && c2 - c1 + 1 === ar[0].length) {
-        for (let r = r1; r <= r2; r++) {
-          for (let c = c1; c <= c2; c++) {
-            const cell = this.table!.findCell(r, c);
-            if (cell) {
-              cell.value = ar[r][c];
-            }
-          }
-        }
       } else {
-        let cell = null;
         for (let r = 0, tableRow = r1; r < ar.length; r++, tableRow++) {
           const row = ar[r];
           for (let c = 0, tableCol = c1; c < row.length; c++, tableCol++) {
             const col = row[c];
-            cell = this.table!.findCell(tableRow, tableCol);
+            const cell = this.table!.findOrCreateCell(tableRow, tableCol);
             if (cell) {
               cell.value = col;
             }
           }
         }
-        if (cell) {
-          this.range = Range.of(r1, c1, cell.row, cell.col);
-        }
+        this.range = Range.of(
+          r1,
+          c1,
+          r1 + ar.length - 1,
+          c1 + ar[0].length - 1,
+        );
       }
     });
   }
