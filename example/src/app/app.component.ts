@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { SpreadsheetSettings } from 'ngx-spreadsheet';
 
 @Component({
   selector: 'app-root',
@@ -112,7 +111,7 @@ export class AppComponent {
         new Date().toLocaleString(),
       ]);
     }
-    this.data = SpreadsheetSettings.load(dummy).data;
+    this.data = dummy;
   }
 
   private parse(value: string): number {
