@@ -12,15 +12,12 @@ import {
 import { NgxContextMenuComponent } from './ngx-context-menu.component';
 import { Subjectize } from 'subjectize';
 import { merge, ReplaySubject } from 'rxjs';
-import {
-  distinctUntilChanged,
-  map,
-  scan,
-  withLatestFrom,
-} from 'rxjs/operators';
+import { distinctUntilChanged, map, scan } from 'rxjs/operators';
 import { csvToArray } from './csv-converter';
 import { Anchor, Cell, Range, Table } from './model';
 import { ColumnOptions } from './model/table';
+import { NSS_I18N } from './providers';
+import deepMerge from 'ts-deepmerge';
 
 @Component({
   selector: 'ngx-spreadsheet',
@@ -29,6 +26,17 @@ import { ColumnOptions } from './model/table';
 })
 export class NgxSpreadsheetComponent {
   private readonly injector = inject(Injector);
+  public readonly i18n = deepMerge(
+    {
+      INSERT_COLUMN_LEFT: 'Insert column left',
+      INSERT_COLUMN_RIGHT: 'Insert column right',
+      DELETE_COLUMN: 'Delete column',
+      DELETE_ROW: 'Delete row',
+      INSERT_ROW_BELOW: 'Insert row below',
+      INSERT_ROW_ABOVE: 'Insert row above',
+    },
+    inject(NSS_I18N, { optional: true }) ?? {},
+  );
   @ViewChild('theadMenu')
   theadContextMenu!: NgxContextMenuComponent;
   @ViewChild('tbodyMenu')
@@ -66,6 +74,19 @@ export class NgxSpreadsheetComponent {
     ),
     distinctUntilChanged(),
   );
+
+  constructor() {
+    console.log(
+      'merged?',
+      deepMerge(
+        {
+          INSERT_COLUMN_LEFT: 'Insert column left',
+          INSERT_COLUMN_RIGHT: 'Insert column right',
+        },
+        inject(NSS_I18N, { optional: true }) ?? {},
+      ),
+    );
+  }
 
   @Output()
   copied = new EventEmitter<string>();
@@ -253,8 +274,6 @@ export class NgxSpreadsheetComponent {
     // Return false to prevent browser from opening its own context menu on top
     return false;
   }
-
-  //#endregion
 
   private moveTo(
     row: number,
