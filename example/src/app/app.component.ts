@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ColumnOptions } from 'ngx-spreadsheet';
 
 @Component({
   selector: 'app-root',
@@ -63,6 +64,7 @@ import { Component } from '@angular/core';
       <button (click)="createDummy()">Create dummy table</button>
     </div>
     <ngx-spreadsheet
+      [columns]="columns"
       [rows]="rows"
       [cols]="cols"
       [data]="data"
@@ -85,6 +87,13 @@ export class AppComponent {
   data: any;
   rows: number = this.DEFAULT_VALUE;
   cols: number = this.DEFAULT_VALUE;
+  columns: ColumnOptions[] = [
+    'Product ID',
+    'Product Category',
+    'Status',
+    'Price',
+    'Date',
+  ].map((v) => ({ header: v }));
 
   constructor() {
     this.createDummy();
@@ -99,9 +108,7 @@ export class AppComponent {
   createDummy(): void {
     const category = ['Bag', 'Hat', 'Footwear', 'Wallet', 'Kitchen', 'Outdoor'];
     const status = ['Draft', 'Review', 'Approve', 'Reject', 'Discard'];
-    const dummy = [
-      ['Product ID', 'Product Category', 'Status', 'Price', 'Date'],
-    ];
+    const dummy = [];
     for (let i = 0; i < 15; i++) {
       dummy.push([
         `PID${i}`,

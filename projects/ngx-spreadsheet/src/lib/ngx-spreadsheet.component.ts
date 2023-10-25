@@ -20,6 +20,7 @@ import {
 } from 'rxjs/operators';
 import { csvToArray } from './csv-converter';
 import { Anchor, Cell, Range, Table } from './model';
+import { ColumnOptions } from './model/table';
 
 @Component({
   selector: 'ngx-spreadsheet',
@@ -36,9 +37,11 @@ export class NgxSpreadsheetComponent {
   @Input() data: any[][] | null = null;
   @Input() rows: number | null = null;
   @Input() cols: number | null = null;
+  @Input() columns: ColumnOptions[] | null = null;
   @Subjectize('data') data$ = new ReplaySubject<any[][]>(1);
   @Subjectize('rows') rows$ = new ReplaySubject<number>(1);
   @Subjectize('cols') cols$ = new ReplaySubject<number>(1);
+  @Subjectize('columns') columns$ = new ReplaySubject<ColumnOptions[]>(1);
   /**
    * The table observable integrates all the reactive pipes into a higher order scan that
    * can mutate or replace the table reference.
@@ -50,6 +53,10 @@ export class NgxSpreadsheetComponent {
     this.rows$.pipe(map((rows) => (table: Table) => table.resize({ rows }))),
     // Col input changed, resize table
     this.cols$.pipe(map((cols) => (table: Table) => table.resize({ cols }))),
+    // Columns changed, recreate table
+    this.columns$.pipe(
+      map((columns) => (table: Table) => table.recreate({ columns })),
+    ),
   ).pipe(
     scan(
       (table, modifier: (table: Table) => Table | void) =>
