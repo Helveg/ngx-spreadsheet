@@ -2,8 +2,11 @@ import {
   Component,
   EventEmitter,
   HostListener,
+  inject,
+  Injector,
   Input,
   Output,
+  runInInjectionContext,
   ViewChild,
 } from '@angular/core';
 import { NgxContextMenuComponent } from './ngx-context-menu.component';
@@ -13,7 +16,6 @@ import {
   distinctUntilChanged,
   map,
   scan,
-  startWith,
   withLatestFrom,
 } from 'rxjs/operators';
 import { csvToArray } from './csv-converter';
@@ -25,6 +27,7 @@ import { Anchor, Cell, Range, Table } from './model';
   styleUrls: ['./ngx-spreadsheet.component.scss'],
 })
 export class NgxSpreadsheetComponent {
+  private readonly injector = inject(Injector);
   @ViewChild('theadMenu')
   theadContextMenu!: NgxContextMenuComponent;
   @ViewChild('tbodyMenu')
@@ -34,45 +37,25 @@ export class NgxSpreadsheetComponent {
   @Input() rows: number | null = null;
   @Input() cols: number | null = null;
   @Subjectize('data') data$ = new ReplaySubject<any[][]>(1);
-  @Subjectize('rows') _rows$ = new ReplaySubject<number>(1);
-  @Subjectize('cols') _cols$ = new ReplaySubject<number>(1);
-  rows$ = this._rows$.pipe(
-    startWith(3),
-    scan((acc, value) => value ?? acc, 3),
-  );
-  cols$ = this._cols$.pipe(
-    startWith(3),
-    scan((acc, value) => value ?? acc, 3),
-  );
+  @Subjectize('rows') rows$ = new ReplaySubject<number>(1);
+  @Subjectize('cols') cols$ = new ReplaySubject<number>(1);
   /**
    * The table observable integrates all the reactive pipes into a higher order scan that
    * can mutate or replace the table reference.
    */
   table$ = merge(
     // Data object reference changed, create new table based on data
-    this.data$.pipe(
-      withLatestFrom(this.rows$, this.cols$),
-      map(
-        ([data, rows, cols]) =>
-          () =>
-            // If data is set to null, create blank table of same size
-            data ? Table.load(data) : Table.empty(rows, cols),
-      ),
-    ),
+    this.data$.pipe(map((data) => (table: Table) => table.recreate({ data }))),
     // Row input changed, resize table
     this.rows$.pipe(map((rows) => (table: Table) => table.resize({ rows }))),
     // Col input changed, resize table
     this.cols$.pipe(map((cols) => (table: Table) => table.resize({ cols }))),
   ).pipe(
     scan(
-      (table, modifier: (table: Table) => Table | void) => {
-        table = modifier(table) ?? table;
-        if (table !== this.table) {
-          this.table = table;
-        }
-        return table;
-      },
-      Table.empty(3, 3),
+      (table, modifier: (table: Table) => Table | void) =>
+        (this.table =
+          runInInjectionContext(this.injector, () => modifier(table)) ?? table),
+      Table.create({}),
     ),
     distinctUntilChanged(),
   );
@@ -90,10 +73,8 @@ export class NgxSpreadsheetComponent {
 
   @HostListener('mousedown', ['$event'])
   private mousedown(ev: MouseEvent): void {
-    console.log('mousedown');
     const { row, col, valid } = this.getPositionFromId(ev.target);
     if (!valid) {
-      console.log('cell not valid', row, col, valid);
       return;
     }
     this.range = Range.of(row, col);
@@ -252,15 +233,18 @@ export class NgxSpreadsheetComponent {
     }
   }
 
-  //#region menu event handle
-  showTheadMenu(ev: MouseEvent, index: number): void {
+  showTheadMenu(ev: MouseEvent, index: number) {
     ev.stopPropagation();
     this.theadContextMenu.show(ev, index);
+    // Return false to prevent browser from opening its own context menu on top
+    return false;
   }
 
-  showTbodyMenu(ev: MouseEvent, index: number): void {
+  showTbodyMenu(ev: MouseEvent, index: number) {
     ev.stopPropagation();
     this.tbodyContextMenu.show(ev, index);
+    // Return false to prevent browser from opening its own context menu on top
+    return false;
   }
 
   //#endregion
@@ -367,6 +351,8 @@ export class NgxSpreadsheetComponent {
           }
         }
       } else {
+        let mr: number = 0,
+          mc: number = 0;
         for (let r = 0, tableRow = r1; r < ar.length; r++, tableRow++) {
           const row = ar[r];
           for (let c = 0, tableCol = c1; c < row.length; c++, tableCol++) {
@@ -374,15 +360,12 @@ export class NgxSpreadsheetComponent {
             const cell = this.table!.findOrCreateCell(tableRow, tableCol);
             if (cell) {
               cell.value = col;
+              mr = Math.max(cell.row, mr);
+              mc = Math.max(cell.col, mc);
             }
           }
         }
-        this.range = Range.of(
-          r1,
-          c1,
-          r1 + ar.length - 1,
-          c1 + ar[0].length - 1,
-        );
+        this.range = Range.of(r1, c1, mr, mc);
       }
     });
   }

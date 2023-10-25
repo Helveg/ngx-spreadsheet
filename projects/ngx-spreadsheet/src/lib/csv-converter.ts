@@ -11,6 +11,9 @@ const PARSE_PATTERN = new RegExp(
 );
 
 export const csvToArray = (strData: string): string[][] => {
+  if (strData.endsWith('\r\n')) {
+    strData = strData.slice(0, strData.length - 2);
+  }
   const arrData: string[][] = [[]];
   let arrMatches = null;
   while ((arrMatches = PARSE_PATTERN.exec(strData))) {
@@ -25,6 +28,5 @@ export const csvToArray = (strData: string): string[][] => {
 
     arrData[arrData.length - 1].push(strMatchedValue);
   }
-  arrData.pop();
   return arrData;
 };

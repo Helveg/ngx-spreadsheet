@@ -1,48 +1,83 @@
 import { Cell } from './cell';
 import { generateHeader } from '../header-index-generator';
 import { generateId } from '../id-generator';
+import { inject, InjectionToken } from '@angular/core';
+import { NSS_DEFAULT_COLS, NSS_DEFAULT_ROWS } from '../providers';
+import merge from 'ts-deepmerge';
+
+export interface ColumnOptions {
+  header?: string;
+  width?: number;
+}
+
+export interface TableOptions {
+  rows?: number;
+  cols?: number;
+  data?: any[][];
+  columns?: ColumnOptions[];
+  canInsertRows?: boolean;
+  canInsertCols?: boolean;
+}
+
+function getDefault<
+  T extends InjectionToken<unknown>,
+  K = T extends InjectionToken<infer K> ? K : never,
+>(token: T, defaultValue: K): K {
+  try {
+    return inject<K>(token, { optional: true }) ?? defaultValue;
+  } catch (err) {
+    console.warn(
+      `You are creating a spreadsheet table outside of any injection context. ` +
+        `Any configuration you have provided for ${token} can't be retrieved and ` +
+        `the default value '${defaultValue}' will be used.`,
+    );
+  }
+  return defaultValue;
+}
 
 export class Table {
-  constructor(
-    public id: string,
+  private constructor(
+    public readonly id: string,
     public head: string[],
     public body: Cell[][],
+    public canInsertRows: boolean,
+    public canInsertCols: boolean,
+    protected options: TableOptions,
   ) {}
 
-  public static empty(rows: number, cols: number): Table {
-    const tableId = generateId();
-    const row = Array(cols).fill('');
-    const head = row.map((v, c) => generateHeader(c + 1));
-    const body = [];
-    for (let r = 0; r < rows; r++) {
-      body.push(row.map((v, c) => new Cell(tableId, r, c, '')));
-    }
-    return new Table(tableId, head, body);
+  public recreate(options: TableOptions) {
+    return Table.create(merge({}, this.options, options));
   }
 
-  public static load(data: string[][]): Table {
-    if (!data.length) {
-      throw new Error('Error: invalid data structure');
-    }
+  public static create(options: TableOptions) {
+    options = merge({}, options);
     const tableId = generateId();
-    const cols = data.reduce(
-      (prev, current) => Math.max(prev, current.length),
-      0,
+    const rows =
+      options.data?.length ?? options.rows ?? getDefault(NSS_DEFAULT_ROWS, 10);
+    const cols =
+      options.data?.[0]?.length ??
+      options.cols ??
+      options.columns?.length ??
+      getDefault(NSS_DEFAULT_COLS, 5);
+    const emptyRow = Array(cols).fill(undefined);
+    const head = emptyRow.map(
+      (v, c) => options.columns?.[c]?.header ?? generateHeader(c + 1),
     );
-    const head = Array(cols)
-      .fill('')
-      .map((v, c) => generateHeader(c + 1));
-    const body = [];
-    for (let r = 0; r < data.length; r++) {
-      const row = data[r];
-      const bodyRow: Cell[] = [];
-      for (let c = 0; c < cols; c++) {
-        const value = c < row.length ? row[c] : '';
-        bodyRow.push(new Cell(tableId, r, c, value));
-      }
-      body.push(bodyRow);
-    }
-    return new Table(tableId, head, body);
+    const body = Array(rows)
+      .fill(undefined)
+      .map((v, r) =>
+        emptyRow.map(
+          (v, c) => new Cell(tableId, r, c, options.data?.[r]?.[c] ?? ''),
+        ),
+      );
+    return new Table(
+      tableId,
+      head,
+      body,
+      options.canInsertRows ?? true,
+      options.canInsertCols ?? true,
+      options,
+    );
   }
 
   public findCell(row: number, col: number): Cell | null {
@@ -56,7 +91,7 @@ export class Table {
     return null;
   }
 
-  public findOrCreateCell(row: number, col: number): Cell {
+  public findOrCreateCell(row: number, col: number): Cell | null {
     for (const record of this.body) {
       for (const field of record) {
         if (field.row === row && field.col === col) {
@@ -65,11 +100,12 @@ export class Table {
       }
     }
     const resize: { rows?: number; cols?: number } = {};
-    console.log(this.rowCount, row, this.colCount, col);
     if (this.rowCount <= row) {
+      if (!this.canInsertRows) return null;
       resize.rows = row + 1;
     }
     if (this.colCount <= col) {
+      if (!this.canInsertCols) return null;
       resize.cols = col + 1;
     }
     this.resize(resize);

@@ -1,10 +1,19 @@
-import { Component, ContentChildren, ElementRef, EventEmitter, HostListener, Output, QueryList, ViewChild } from '@angular/core';
+import {
+  Component,
+  ContentChildren,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Output,
+  QueryList,
+  ViewChild,
+} from '@angular/core';
 import { NgxContextMenuItemComponent } from './ngx-context-menu-item.component';
 
 @Component({
   selector: 'ngx-context-menu',
   templateUrl: './ngx-context-menu.component.html',
-  styleUrls: ['./ngx-context-menu.component.scss']
+  styleUrls: ['./ngx-context-menu.component.scss'],
 })
 export class NgxContextMenuComponent {
   @ViewChild('menu', { static: true })
@@ -22,10 +31,14 @@ export class NgxContextMenuComponent {
     this.target = index;
     this.menuElement.style.display = 'flex';
 
-    const menuTop = ((ev.clientY + this.menuHeight) > this.documentHeight) ?
-      ev.pageY - this.menuHeight : ev.pageY + 15;
-    const menuLeft = ((ev.clientX + this.menuWidth) > this.documentWidth) ?
-      ev.pageX - this.menuWidth : ev.pageX;
+    const menuTop =
+      ev.clientY + this.menuHeight > this.documentHeight
+        ? ev.pageY - this.menuHeight
+        : ev.pageY;
+    const menuLeft =
+      ev.clientX + this.menuWidth > this.documentWidth
+        ? ev.pageX - this.menuWidth
+        : ev.pageX;
     this.menuElement.style.top = `${menuTop}px`;
     this.menuElement.style.left = `${menuLeft}px`;
   }
@@ -45,15 +58,23 @@ export class NgxContextMenuComponent {
   }
 
   private get menuWidth(): number {
-    return this.menuElement.offsetWidth +
-      parseInt(this.menuStyle.marginLeft) + parseInt(this.menuStyle.marginRight) +
-      parseInt(this.menuStyle.paddingLeft) + parseInt(this.menuStyle.paddingRight);
+    return (
+      this.menuElement.offsetWidth +
+      parseInt(this.menuStyle.marginLeft) +
+      parseInt(this.menuStyle.marginRight) +
+      parseInt(this.menuStyle.paddingLeft) +
+      parseInt(this.menuStyle.paddingRight)
+    );
   }
 
   private get menuHeight(): number {
-    return this.menuElement.offsetHeight +
-      parseInt(this.menuStyle.marginTop) + parseInt(this.menuStyle.marginBottom) +
-      parseInt(this.menuStyle.paddingTop) + parseInt(this.menuStyle.paddingBottom);
+    return (
+      this.menuElement.offsetHeight +
+      parseInt(this.menuStyle.marginTop) +
+      parseInt(this.menuStyle.marginBottom) +
+      parseInt(this.menuStyle.paddingTop) +
+      parseInt(this.menuStyle.paddingBottom)
+    );
   }
 
   private get documentWidth(): number {
@@ -63,5 +84,4 @@ export class NgxContextMenuComponent {
   private get documentHeight(): number {
     return document.documentElement.clientHeight;
   }
-
 }

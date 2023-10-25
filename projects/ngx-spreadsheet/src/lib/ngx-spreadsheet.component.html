@@ -5,24 +5,19 @@
                 <tr>
                     <th></th>
                     <th *ngFor="let col of table.head; let c = index" (click)="clickHeader(c)"
+                        (contextmenu)="showTheadMenu($event, c)"
                         (mouseenter)="activeTheadIndex = c" (mouseleave)="activeTheadIndex = -1">
                         <div class="head">
                             <div class="label">{{col}}</div>
-                            <div class="dropdown" *ngIf="activeTheadIndex === c">
-                                <button class="dropbtn" (click)="showTheadMenu($event, c)">&gt;</button>
-                            </div>
                         </div>
                     </th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let row of table.body; let r = index;">
-                    <th (click)="clickRow(r)" (mouseenter)="activeTbodyIndex = r" (mouseleave)="activeTbodyIndex = -1">
+                    <th (click)="clickRow(r)" (contextmenu)="showTbodyMenu($event, r)" (mouseenter)="activeTbodyIndex = r" (mouseleave)="activeTbodyIndex = -1">
                         <div class="head">
                             <div class="label">{{r + 1}}</div>
-                            <div class="dropdown" *ngIf="activeTbodyIndex === r">
-                                <button class="dropbtn" (click)="showTbodyMenu($event, r)">&gt;</button>
-                            </div>
                         </div>
                     </th>
                     <td [id]="cell.id" *ngFor="let cell of row; let c = index; trackBy: trackByCell"
