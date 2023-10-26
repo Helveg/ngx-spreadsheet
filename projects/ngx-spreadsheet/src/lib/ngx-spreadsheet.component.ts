@@ -17,7 +17,7 @@ import { csvToArray } from './csv-converter';
 import { Anchor, Cell, Range, Table } from './model';
 import { ColumnOptions } from './model/table';
 import { NSS_I18N } from './providers';
-import deepMerge from 'ts-deepmerge';
+import { deepmerge } from 'deepmerge-ts';
 
 @Component({
   selector: 'ngx-spreadsheet',
@@ -26,7 +26,7 @@ import deepMerge from 'ts-deepmerge';
 })
 export class NgxSpreadsheetComponent {
   private readonly injector = inject(Injector);
-  public readonly i18n = deepMerge(
+  public readonly i18n = deepmerge(
     {
       INSERT_COLUMN_LEFT: 'Insert column left',
       INSERT_COLUMN_RIGHT: 'Insert column right',

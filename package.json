@@ -1,12 +1,12 @@
 {
   "name": "ngx-spreadsheet",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build ngx-spreadsheet",
-    "publish": "npm run build && npm publish ./dist/ngx-spreadsheet",
     "build:example": "ng build example",
+    "publish": "rimraf ./dist && npm run build && npm publish ./dist/ngx-spreadsheet --access=public",
     "watch": "ng build ngx-spreadsheet --watch --configuration development",
     "ghpages": "rimraf dist/example && ng build example --configuration production --base-href \"https://helveg.github.io/ngx-spreadsheet/\" && ngh --dir=dist/example",
     "test": "ng test"
@@ -22,10 +22,10 @@
     "@angular/platform-browser-dynamic": "^16.2.10",
     "@angular/router": "^16.2.10",
     "@ngrx/component": "^16.3.0",
+    "deepmerge-ts": "^5.1.0",
     "ngx-spreadsheet": "^1.0.0",
     "rxjs": "~6.6.0",
     "subjectize": "^0.2.3",
-    "ts-deepmerge": "^6.2.0",
     "tslib": "^2.3.1",
     "zone.js": "~0.13.3"
   },
