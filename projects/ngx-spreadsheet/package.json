@@ -1,6 +1,6 @@
 {
   "name": "ngx-spreadsheet",
-  "version": "0.2.5",
+  "version": "0.3",
   "peerDependencies": {
     "@angular/common": "^13 || ^14 || ^15 || ^16",
     "@angular/core": "^13 || ^14 || ^15 || ^16"
