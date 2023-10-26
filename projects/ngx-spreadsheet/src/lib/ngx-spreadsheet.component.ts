@@ -75,19 +75,6 @@ export class NgxSpreadsheetComponent {
     distinctUntilChanged(),
   );
 
-  constructor() {
-    console.log(
-      'merged?',
-      deepMerge(
-        {
-          INSERT_COLUMN_LEFT: 'Insert column left',
-          INSERT_COLUMN_RIGHT: 'Insert column right',
-        },
-        inject(NSS_I18N, { optional: true }) ?? {},
-      ),
-    );
-  }
-
   @Output()
   copied = new EventEmitter<string>();
 
