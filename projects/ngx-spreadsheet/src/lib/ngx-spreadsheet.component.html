@@ -22,7 +22,7 @@
                     </th>
                     <td [id]="cell.id" *ngFor="let cell of row; let c = index; trackBy: trackByCell"
                         [class.focus]="cell === activatedCell" [class.sel]="range?.includes(cell.row, cell.col)"
-                        nssContentEditable [(model)]="cell.value" (focus)="focus($event)" (blur)="blur($event)"
+                        nssContentEditable [model]="cell.value" (modelChange)="updateValue(table, cell, $event)" (focus)="focus($event)" (blur)="blur($event)"
                         (dblclick)="dblclick($event, cell)" [attr.contenteditable]="cell.editable">
                     </td>
                 </tr>

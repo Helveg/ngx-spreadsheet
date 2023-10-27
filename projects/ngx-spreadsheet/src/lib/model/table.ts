@@ -3,7 +3,14 @@ import { generateHeader } from '../header-index-generator';
 import { generateId } from '../id-generator';
 import { inject, InjectionToken } from '@angular/core';
 import { NSS_DEFAULT_COLS, NSS_DEFAULT_ROWS } from '../providers';
-import merge from 'ts-deepmerge';
+import type { DeepMergeLeafURI } from 'deepmerge-ts';
+import { deepmergeCustom } from 'deepmerge-ts';
+
+const noArrayDeepMerge = deepmergeCustom<{
+  DeepMergeArraysURI: DeepMergeLeafURI;
+}>({
+  mergeArrays: false,
+});
 
 export interface ColumnOptions {
   header?: string;
@@ -45,12 +52,16 @@ export class Table {
     protected options: TableOptions,
   ) {}
 
+  public get data(): any[][] {
+    return this.body.map((row) => row.map((cell) => cell.value));
+  }
+
   public recreate(options: TableOptions) {
-    return Table.create(merge({}, this.options, options));
+    return Table.create(noArrayDeepMerge({}, this.options, options));
   }
 
   public static create(options: TableOptions) {
-    options = merge({}, options);
+    options = noArrayDeepMerge({}, options);
     const tableId = generateId();
     const rows =
       options.data?.length ?? options.rows ?? getDefault(NSS_DEFAULT_ROWS, 10);

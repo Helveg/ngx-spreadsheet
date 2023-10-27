@@ -43,6 +43,7 @@ export class NgxSpreadsheetComponent {
   tbodyContextMenu!: NgxContextMenuComponent;
 
   @Input() data: any[][] | null = null;
+  @Output() dataChanged = new EventEmitter<any[][]>();
   @Input() rows: number | null = null;
   @Input() cols: number | null = null;
   @Input() columns: ColumnOptions[] | null = null;
@@ -75,8 +76,7 @@ export class NgxSpreadsheetComponent {
     distinctUntilChanged(),
   );
 
-  @Output()
-  copied = new EventEmitter<string>();
+  @Output() copied = new EventEmitter<string>();
 
   table: Table | null = null;
   activatedCell: Cell | null = null;
@@ -381,6 +381,7 @@ export class NgxSpreadsheetComponent {
         this.range = Range.of(r1, c1, mr, mc);
       }
     });
+    this.dataChanged.emit(this.table.data);
   }
 
   private delete(): void {
@@ -395,6 +396,14 @@ export class NgxSpreadsheetComponent {
           cell.value = '';
         }
       }
+    }
+    this.dataChanged.emit(this.table.data);
+  }
+
+  updateValue(table: Table, cell: any, $event: string) {
+    if (cell.value != $event) {
+      cell.value = $event;
+      this.dataChanged.emit(table.data);
     }
   }
 }
