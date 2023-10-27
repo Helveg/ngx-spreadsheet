@@ -1,6 +1,6 @@
 {
   "name": "@helveg/ngx-spreadsheet",
-  "version": "0.3.4",
+  "version": "0.5.0",
   "peerDependencies": {
     "@angular/common": "^13 || ^14 || ^15 || ^16",
     "@angular/core": "^13 || ^14 || ^15 || ^16",

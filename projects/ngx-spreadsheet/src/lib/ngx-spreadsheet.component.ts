@@ -11,13 +11,25 @@ import {
 } from '@angular/core';
 import { NgxContextMenuComponent } from './ngx-context-menu.component';
 import { Subjectize } from 'subjectize';
-import { merge, ReplaySubject } from 'rxjs';
+import { merge, Observable, ReplaySubject } from 'rxjs';
 import { distinctUntilChanged, map, scan } from 'rxjs/operators';
 import { csvToArray } from './csv-converter';
 import { Anchor, Cell, Range, Table } from './model';
-import { ColumnOptions } from './model/table';
+import { ColumnOptions, SettableTableOptions } from './model/table';
 import { NSS_I18N } from './providers';
 import { deepmerge } from 'deepmerge-ts';
+
+function setPipe<K extends SettableTableOptions>(
+  obs$: Observable<Table[K]>,
+  attr: K,
+) {
+  return obs$.pipe(
+    map((value: Table[K]) => (table: Table) => {
+      table.setOption(attr, value);
+      return table;
+    }),
+  );
+}
 
 @Component({
   selector: 'ngx-spreadsheet',
@@ -45,15 +57,21 @@ export class NgxSpreadsheetComponent {
   @Input() rows: number | null = null;
   @Input() cols: number | null = null;
   @Input() columns: ColumnOptions[] | null = null;
+  @Input() canInsertCols: boolean | null = null;
+  @Input() canInsertRows: boolean | null = null;
   @Subjectize('data') data$ = new ReplaySubject<any[][]>(1);
   @Subjectize('rows') rows$ = new ReplaySubject<number>(1);
   @Subjectize('cols') cols$ = new ReplaySubject<number>(1);
   @Subjectize('columns') columns$ = new ReplaySubject<ColumnOptions[]>(1);
+  @Subjectize('canInsertRows') canInsertRows$ = new ReplaySubject<boolean>(1);
+  @Subjectize('canInsertCols') canInsertCols$ = new ReplaySubject<boolean>(1);
   /**
    * The table observable integrates all the reactive pipes into a higher order scan that
    * can mutate or replace the table reference.
    */
   table$ = merge(
+    setPipe(this.canInsertCols$, 'canInsertCols'),
+    setPipe(this.canInsertRows$, 'canInsertRows'),
     // Data object reference changed, create new table based on data
     this.data$.pipe(map((data) => (table: Table) => table.recreate({ data }))),
     // Row input changed, resize table

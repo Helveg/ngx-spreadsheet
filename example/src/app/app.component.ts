@@ -62,9 +62,13 @@ import { ColumnOptions } from 'ngx-spreadsheet';
       </button>
       <div class="divider"></div>
       <button (click)="createDummy()">Create dummy table</button>
+      <button (click)="freeze()">Freeze size</button>
+      <button (click)="unfreeze()">Unfreeze size</button>
     </div>
     <ngx-spreadsheet
       [columns]="columns"
+      [canInsertCols]="canInsertCols"
+      [canInsertRows]="canInsertRows"
       [rows]="rows"
       [cols]="cols"
       [data]="data"
@@ -87,6 +91,8 @@ export class AppComponent {
   data: any;
   rows: number = this.DEFAULT_VALUE;
   cols: number = this.DEFAULT_VALUE;
+  canInsertCols: boolean = true;
+  canInsertRows: boolean = true;
   columns: ColumnOptions[] = [
     'Product ID',
     'Product Category',
@@ -131,5 +137,15 @@ export class AppComponent {
 
   private random(max: number): number {
     return Math.floor(Math.random() * max);
+  }
+
+  freeze() {
+    this.canInsertCols = false;
+    this.canInsertRows = false;
+  }
+
+  unfreeze() {
+    this.canInsertCols = true;
+    this.canInsertRows = true;
   }
 }

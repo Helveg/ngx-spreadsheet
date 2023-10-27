@@ -26,6 +26,8 @@ export interface TableOptions {
   canInsertCols?: boolean;
 }
 
+export type SettableTableOptions = keyof Table & keyof TableOptions;
+
 function getDefault<
   T extends InjectionToken<unknown>,
   K = T extends InjectionToken<infer K> ? K : never,
@@ -218,5 +220,13 @@ export class Table {
         this.insertColumn(this.colCount);
       }
     }
+  }
+
+  setOption<K extends keyof this & keyof TableOptions>(
+    attr: K,
+    value: this[K],
+  ) {
+    this.options[attr] = value;
+    this[attr] = value;
   }
 }
