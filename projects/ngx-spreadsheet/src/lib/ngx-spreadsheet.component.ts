@@ -193,6 +193,14 @@ export class NgxSpreadsheetComponent {
       this.activatedCell.value = '';
       this.setEditable(ev, true);
     }
+    this.blockArrowKeys(ev);
+  }
+
+  private blockArrowKeys(ev: KeyboardEvent) {
+    if (ev.key.toLowerCase().startsWith('arrow')) {
+      ev.stopPropagation();
+      ev.preventDefault();
+    }
   }
 
   @HostListener('document:keyup', ['$event'])
@@ -218,6 +226,7 @@ export class NgxSpreadsheetComponent {
         this.moveTo(row, col + 1, ev.shiftKey, false);
         break;
     }
+    this.blockArrowKeys(ev);
   }
 
   trackByCell(index: number, value: Cell): string | null {
