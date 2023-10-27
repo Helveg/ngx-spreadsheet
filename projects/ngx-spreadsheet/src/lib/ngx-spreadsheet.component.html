@@ -47,9 +47,12 @@
           ></td>
         </tr>
         <!--New data row, click to increase row size-->
-        <tr (click)="newRow()" *ngIf="table.canInsertRows">
+        <tr *ngIf="table.canInsertRows">
           <th>*</th>
-          <td *ngFor="let _ of [].constructor(table.colCount)"></td>
+          <td
+            *ngFor="let _ of [].constructor(table.colCount); let i = index"
+            (click)="newRow(i)"
+          ></td>
         </tr>
       </tbody>
     </table>
