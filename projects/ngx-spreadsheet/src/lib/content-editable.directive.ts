@@ -1,15 +1,22 @@
-import { Directive, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Input,
+  Output,
+} from '@angular/core';
 
 @Directive({
-  selector: '[nssContentEditable]'
+  selector: '[nssContentEditable]',
 })
 export class ContentEditableDirective {
   @Input()
-  set model(value: string) {
+  set content(value: string) {
     this.element.innerText = value || '';
   }
   @Output()
-  modelChange = new EventEmitter<string>();
+  contentChange = new EventEmitter<string>();
 
   constructor(private elementRef: ElementRef<HTMLElement>) {
     this.element.tabIndex = 0;
@@ -17,7 +24,7 @@ export class ContentEditableDirective {
 
   @HostListener('blur', ['$event.target.value'])
   blur() {
-    this.modelChange.emit(this.element.innerText);
+    this.contentChange.emit(this.element.innerText);
   }
 
   get element(): HTMLElement {
