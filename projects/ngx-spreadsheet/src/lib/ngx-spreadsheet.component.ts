@@ -159,12 +159,21 @@ export class NgxSpreadsheetComponent {
       this.setEditable(ev, true);
     } else if (key === 'escape') {
       this.setEditable(ev, false);
+    } else if (key === 'a' && isCtrl) {
+      this.selectAll(ev);
     } else if (key === 'c' && isCtrl) {
       this.copy();
     } else if (key === 'v' && isCtrl) {
       this.paste();
     } else if (key === 'delete') {
       this.delete();
+    } else if (
+      this.activatedCell &&
+      !this.activatedCell.editable &&
+      /^.$/u.test(key)
+    ) {
+      this.activatedCell.value = '';
+      this.setEditable(ev, true);
     }
   }
 
@@ -226,7 +235,7 @@ export class NgxSpreadsheetComponent {
     }
   }
 
-  dblclick(ev: Event, target: Cell): void {
+  cellMouseUp(ev: Event, target: Cell): void {
     const td = ev.target as HTMLTableCellElement;
     if (target === this.activatedCell) {
       target.editable = true;
@@ -402,6 +411,17 @@ export class NgxSpreadsheetComponent {
     if (cell.value != $event) {
       cell.value = $event;
       this.dataChanged.emit(table.data);
+    }
+  }
+
+  selectAll(event$?: Event) {
+    if (!this.table || this.table.editing) {
+      return;
+    }
+    this.range = Range.of(0, 0, this.table.rowCount, this.table.colCount);
+    if (event$) {
+      event$.stopPropagation();
+      event$.preventDefault();
     }
   }
 }

@@ -1,58 +1,93 @@
 <ng-container *ngrxLet="table$ as table">
-    <div class="container">
-        <table>
-            <thead>
-                <tr>
-                    <th></th>
-                    <th *ngFor="let col of table.head; let c = index" (click)="clickHeader(c)"
-                        (contextmenu)="showTheadMenu($event, c)"
-                        (mouseenter)="activeTheadIndex = c" (mouseleave)="activeTheadIndex = -1">
-                        <div class="head">
-                            <div class="label">{{col}}</div>
-                        </div>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let row of table.body; let r = index;">
-                    <th (click)="clickRow(r)" (contextmenu)="showTbodyMenu($event, r)" (mouseenter)="activeTbodyIndex = r" (mouseleave)="activeTbodyIndex = -1">
-                        <div class="head">
-                            <div class="label">{{r + 1}}</div>
-                        </div>
-                    </th>
-                    <td [id]="cell.id" *ngFor="let cell of row; let c = index; trackBy: trackByCell"
-                        [class.focus]="cell === activatedCell" [class.sel]="range?.includes(cell.row, cell.col)"
-                        nssContentEditable [model]="cell.value" (modelChange)="updateValue(table, cell, $event)" (focus)="focus($event)" (blur)="blur($event)"
-                        (dblclick)="dblclick($event, cell)" [attr.contenteditable]="cell.editable">
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+  <div class="container">
+    <table #htmlTable>
+      <!--Table header-->
+      <thead>
+        <tr>
+          <!--Empty top left header cell-->
+          <th></th>
+          <!--Column header cells-->
+          <th
+            *ngFor="let col of table.head; let c = index"
+            (click)="clickHeader(c)"
+            (contextmenu)="showTheadMenu($event, c)"
+            (mouseenter)="activeTheadIndex = c"
+            (mouseleave)="activeTheadIndex = -1"
+          >
+            {{ col }}
+          </th>
+        </tr>
+      </thead>
+      <!--Table body-->
+      <tbody style="overflow-y: auto">
+        <!--Table rows-->
+        <tr *ngFor="let row of table.body; let r = index">
+          <!--Row header cell-->
+          <th
+            (click)="clickRow(r)"
+            (contextmenu)="showTbodyMenu($event, r)"
+            (mouseenter)="activeTbodyIndex = r"
+            (mouseleave)="activeTbodyIndex = -1"
+          >
+            {{ r + 1 }}
+          </th>
+          <!--Table data cell-->
+          <td
+            [id]="cell.id"
+            *ngFor="let cell of row; let c = index; trackBy: trackByCell"
+            [class.focus]="cell === activatedCell"
+            [class.sel]="range?.includes(cell.row, cell.col)"
+            nssContentEditable
+            [content]="cell.value"
+            (contentChange)="updateValue(table, cell, $event)"
+            (focus)="focus($event)"
+            (blur)="blur($event)"
+            (mousedown)="cellMouseUp($event, cell)"
+            [attr.contenteditable]="cell.editable"
+          ></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!--Column header context menu-->
+  <ngx-context-menu #theadMenu (closed)="activeTheadIndex = -1">
+    <ngx-context-menu-item
+      [label]="i18n.INSERT_COLUMN_LEFT"
+      (click)="table.insertColumn($event)"
+    >
+    </ngx-context-menu-item>
+    <ngx-context-menu-item
+      [label]="i18n.INSERT_COLUMN_RIGHT"
+      (click)="table.insertColumn($event + 1)"
+    >
+    </ngx-context-menu-item>
+    <ngx-context-menu-item [divider]="true"></ngx-context-menu-item>
+    <ngx-context-menu-item
+      [label]="i18n.DELETE_COLUMN"
+      [disabled]="table.colCount <= 1"
+      (click)="table.deleteColumn($event)"
+    >
+    </ngx-context-menu-item>
+  </ngx-context-menu>
 
-    <ngx-context-menu #theadMenu (closed)="activeTheadIndex = -1">
-        <ngx-context-menu-item [label]="i18n.INSERT_COLUMN_LEFT"
-            (click)="table.insertColumn($event)">
-        </ngx-context-menu-item>
-        <ngx-context-menu-item [label]="i18n.INSERT_COLUMN_RIGHT"
-            (click)="table.insertColumn($event + 1)">
-        </ngx-context-menu-item>
-        <ngx-context-menu-item [divider]="true"></ngx-context-menu-item>
-        <ngx-context-menu-item [label]="i18n.DELETE_COLUMN"
-            [disabled]="table.colCount <= 1" (click)="table.deleteColumn($event)">
-        </ngx-context-menu-item>
-    </ngx-context-menu>
-
-    <ngx-context-menu #tbodyMenu (closed)="activeTbodyIndex = -1">
-        <ngx-context-menu-item [label]="i18n.INSERT_ROW_ABOVE"
-            (click)="table.insertRow($event)">
-        </ngx-context-menu-item>
-        <ngx-context-menu-item [label]="i18n.INSERT_ROW_BELOW"
-            (click)="table.insertRow($event + 1)">
-        </ngx-context-menu-item>
-        <ngx-context-menu-item [divider]="true"></ngx-context-menu-item>
-        <ngx-context-menu-item [label]="i18n.DELETE_ROW"
-            [disabled]="table.rowCount <= 1" (click)="table.deleteRow($event)">
-        </ngx-context-menu-item>
-    </ngx-context-menu>
+  <!--Row header context menu-->
+  <ngx-context-menu #tbodyMenu (closed)="activeTbodyIndex = -1">
+    <ngx-context-menu-item
+      [label]="i18n.INSERT_ROW_ABOVE"
+      (click)="table.insertRow($event)"
+    >
+    </ngx-context-menu-item>
+    <ngx-context-menu-item
+      [label]="i18n.INSERT_ROW_BELOW"
+      (click)="table.insertRow($event + 1)"
+    >
+    </ngx-context-menu-item>
+    <ngx-context-menu-item [divider]="true"></ngx-context-menu-item>
+    <ngx-context-menu-item
+      [label]="i18n.DELETE_ROW"
+      [disabled]="table.rowCount <= 1"
+      (click)="table.deleteRow($event)"
+    >
+    </ngx-context-menu-item>
+  </ngx-context-menu>
 </ng-container>
