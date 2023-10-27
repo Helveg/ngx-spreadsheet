@@ -46,6 +46,11 @@
             [attr.contenteditable]="cell.editable"
           ></td>
         </tr>
+        <!--New data row, click to increase row size-->
+        <tr (click)="newRow()" *ngIf="table.canInsertRows">
+          <th>*</th>
+          <td *ngFor="let _ of [].constructor(table.colCount)"></td>
+        </tr>
       </tbody>
     </table>
   </div>

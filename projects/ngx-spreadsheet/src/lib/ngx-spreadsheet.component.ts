@@ -296,6 +296,15 @@ export class NgxSpreadsheetComponent {
     if (!this.table) {
       return;
     }
+    const { rowCount, colCount } = this.table;
+    const resize: { rows?: number; cols?: number } = {};
+    if (rowCount <= row && this.table.canInsertRows) {
+      resize.rows = row + 1;
+    }
+    if (colCount <= col && this.table.canInsertCols) {
+      resize.cols = col + 1;
+    }
+    this.table.resize(resize);
     const { body } = this.table;
     if (row >= 0 && row < body.length) {
       const cols = body[row];
@@ -315,9 +324,6 @@ export class NgxSpreadsheetComponent {
           this.range = Range.marge(this.anchor, { r: row, c: col });
         } else {
           this.range = Range.of(cell.row, cell.col);
-        }
-        if (editable) {
-          cell.editable = true;
         }
       }
     }
@@ -441,5 +447,10 @@ export class NgxSpreadsheetComponent {
       event$.stopPropagation();
       event$.preventDefault();
     }
+  }
+
+  newRow() {
+    if (!this.table) return;
+    this.table.resize({ rows: this.table.rowCount + 1 });
   }
 }
