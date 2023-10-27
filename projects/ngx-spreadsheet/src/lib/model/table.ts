@@ -56,6 +56,10 @@ export class Table {
     return this.body.map((row) => row.map((cell) => cell.value));
   }
 
+  public get editing(): boolean {
+    return this.body.some((r) => r.some((c) => c.editable));
+  }
+
   public recreate(options: TableOptions) {
     return Table.create(noArrayDeepMerge({}, this.options, options));
   }
