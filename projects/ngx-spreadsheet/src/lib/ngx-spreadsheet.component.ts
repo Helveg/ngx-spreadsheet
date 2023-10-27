@@ -37,10 +37,8 @@ export class NgxSpreadsheetComponent {
     },
     inject(NSS_I18N, { optional: true }) ?? {},
   );
-  @ViewChild('theadMenu')
-  theadContextMenu!: NgxContextMenuComponent;
-  @ViewChild('tbodyMenu')
-  tbodyContextMenu!: NgxContextMenuComponent;
+  @ViewChild('theadMenu') theadContextMenu!: NgxContextMenuComponent;
+  @ViewChild('tbodyMenu') tbodyContextMenu!: NgxContextMenuComponent;
 
   @Input() data: any[][] | null = null;
   @Output() dataChanged = new EventEmitter<any[][]>();
@@ -87,7 +85,7 @@ export class NgxSpreadsheetComponent {
   activeTbodyIndex: number = -1;
 
   @HostListener('mousedown', ['$event'])
-  private mousedown(ev: MouseEvent): void {
+  private onMouseDown(ev: MouseEvent): void {
     const { row, col, valid } = this.getPositionFromId(ev.target);
     if (!valid) {
       return;
@@ -99,7 +97,7 @@ export class NgxSpreadsheetComponent {
   }
 
   @HostListener('document:mousemove', ['$event'])
-  private mousemove(ev: MouseEvent): void {
+  private onMouseMove(ev: MouseEvent): void {
     if (!this.range || !this.anchor) {
       return;
     }
@@ -113,7 +111,7 @@ export class NgxSpreadsheetComponent {
   }
 
   @HostListener('document:mouseup', ['$event'])
-  private mouseup(ev: MouseEvent): void {
+  private onMouseUp(ev: MouseEvent): void {
     if (ev.shiftKey && this.anchor) {
       const self = this.getPositionFromId(ev.target);
       if (self.valid) {
