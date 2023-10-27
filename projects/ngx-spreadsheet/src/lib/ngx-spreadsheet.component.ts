@@ -165,11 +165,11 @@ export class NgxSpreadsheetComponent {
       const { row, col, editable } = this.activatedCell;
       const next = ev.shiftKey ? col - 1 : col + 1;
       if (next < 0 && row > 0) {
-        this.moveTo(row - 1, colCount - 1, false, editable);
+        this.moveTo(row - 1, colCount - 1, false);
       } else if (next >= colCount && row < rowCount) {
-        this.moveTo(row + 1, 0, false, editable);
+        this.moveTo(row + 1, 0, false);
       } else {
-        this.moveTo(row, next, false, editable);
+        this.moveTo(row, next, false);
       }
     } else if (key === 'f2') {
       this.setEditable(ev, true);
@@ -212,16 +212,16 @@ export class NgxSpreadsheetComponent {
     const { row, col } = this.activatedCell;
     switch (ev.key.toLowerCase()) {
       case 'arrowup':
-        this.moveTo(row - 1, col, ev.shiftKey, false);
+        this.moveTo(row - 1, col, ev.shiftKey);
         break;
       case 'arrowdown':
-        this.moveTo(row + 1, col, ev.shiftKey, false);
+        this.moveTo(row + 1, col, ev.shiftKey);
         break;
       case 'arrowleft':
-        this.moveTo(row, col - 1, ev.shiftKey, false);
+        this.moveTo(row, col - 1, ev.shiftKey);
         break;
       case 'arrowright':
-        this.moveTo(row, col + 1, ev.shiftKey, false);
+        this.moveTo(row, col + 1, ev.shiftKey);
         break;
     }
     this.blockArrowKeys(ev);
@@ -294,12 +294,7 @@ export class NgxSpreadsheetComponent {
     return false;
   }
 
-  private moveTo(
-    row: number,
-    col: number,
-    shiftKey: boolean,
-    editable: boolean,
-  ): void {
+  private moveTo(row: number, col: number, shiftKey: boolean): void {
     if (!this.table) {
       return;
     }
@@ -456,8 +451,9 @@ export class NgxSpreadsheetComponent {
     }
   }
 
-  newRow() {
+  newRow(col: number) {
     if (!this.table) return;
     this.table.resize({ rows: this.table.rowCount + 1 });
+    this.activatedCell = this.table.findCell(this.table.rowCount - 1, col);
   }
 }
