@@ -157,10 +157,8 @@ export class NgxSpreadsheetComponent {
 
     if (key === 'enter' && this.activatedCell) {
       const { row, col, editable } = this.activatedCell;
-      if (editable && ev.shiftKey) {
-        ev.preventDefault();
-        this.moveTo(row + 1, col, false, editable);
-      }
+      ev.preventDefault();
+      this.moveTo(row + 1, col, false);
     } else if (key === 'tab' && this.activatedCell) {
       ev.preventDefault();
       const { rowCount, colCount } = this.table;
