@@ -313,10 +313,12 @@ export class NgxSpreadsheetComponent {
       const cols = body[row];
       if (col >= 0 && col < cols.length) {
         const cell = cols[col];
-        const e = document.getElementById(cell.id);
-        if (e) {
-          this.forceFocus(e);
-        }
+        setTimeout(() => {
+          const e = document.getElementById(cell.id);
+          if (e) {
+            this.forceFocus(e);
+          }
+        });
         if (shiftKey && this.range && this.anchor) {
           this.range = Range.marge(this.anchor, { r: row, c: col });
         } else {
