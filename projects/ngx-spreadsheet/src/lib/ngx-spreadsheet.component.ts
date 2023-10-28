@@ -190,6 +190,7 @@ export class NgxSpreadsheetComponent {
     ) {
       this.activatedCell.value = '';
       this.setEditable(ev, true);
+      this.forceFocus(ev.target as HTMLElement);
     }
     this.blockArrowKeys(ev);
   }
@@ -314,13 +315,7 @@ export class NgxSpreadsheetComponent {
         const cell = cols[col];
         const e = document.getElementById(cell.id);
         if (e) {
-          e.focus();
-          const s = window.getSelection();
-          const r = document.createRange();
-          r.setStart(e, e.childElementCount);
-          r.setEnd(e, e.childElementCount);
-          s?.removeAllRanges();
-          s?.addRange(r);
+          this.forceFocus(e);
         }
         if (shiftKey && this.range && this.anchor) {
           this.range = Range.marge(this.anchor, { r: row, c: col });
@@ -329,6 +324,16 @@ export class NgxSpreadsheetComponent {
         }
       }
     }
+  }
+
+  private forceFocus(el: HTMLElement) {
+    el.focus();
+    const s = window.getSelection();
+    const r = document.createRange();
+    r.setStart(el, el.childElementCount);
+    r.setEnd(el, el.childElementCount);
+    s?.removeAllRanges();
+    s?.addRange(r);
   }
 
   private findCellByEventTarget(target: EventTarget | null): Cell | null {
