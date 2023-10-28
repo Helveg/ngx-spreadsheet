@@ -460,5 +460,19 @@ export class NgxSpreadsheetComponent {
     if (!this.table) return;
     this.table.resize({ rows: this.table.rowCount + 1 });
     this.activatedCell = this.table.findCell(this.table.rowCount - 1, col);
+    this.range = new Range(
+      this.table.rowCount - 1,
+      col,
+      this.table.rowCount - 1,
+      col,
+    );
+    setTimeout(() => {
+      if (this.activatedCell) {
+        const el = document.getElementById(this.activatedCell.id);
+        if (el) {
+          this.forceFocus(el);
+        }
+      }
+    });
   }
 }
