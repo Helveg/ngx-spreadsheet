@@ -1,9 +1,9 @@
 {
   "name": "@helveg/ngx-spreadsheet",
-  "version": "0.6.3",
+  "version": "1.1.0",
   "peerDependencies": {
-    "@angular/common": "^13 || ^14 || ^15 || ^16",
-    "@angular/core": "^13 || ^14 || ^15 || ^16",
+    "@angular/common": ">=13.0.0 <=19.x",
+    "@angular/core": ">=13.0.0 <=19.x",
     "deepmerge-ts": "^5",
     "subjectize": "^0.2.3"
   },
