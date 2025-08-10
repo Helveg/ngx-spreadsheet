@@ -1,14 +1,14 @@
 <ng-container *ngrxLet="table$ as table">
   <div class="container">
-    <table #htmlTable>
+    <table>
       <!--Table header-->
       <thead>
-        <tr>
-          <!--Empty top left header cell-->
-          <th></th>
-          <!--Column header cells-->
+      <tr>
+        <!--Empty top left header cell-->
+        <th></th>
+        <!--Column header cells-->
+        @for (col of table.head; track col; let c = $index) {
           <th
-            *ngFor="let col of table.head; let c = index"
             (click)="clickHeader(c)"
             (contextmenu)="showTheadMenu($event, c)"
             (mouseenter)="activeTheadIndex = c"
@@ -16,44 +16,51 @@
           >
             {{ col }}
           </th>
-        </tr>
+        }
+      </tr>
       </thead>
       <!--Table body-->
       <tbody style="overflow-y: auto">
-        <!--Table rows-->
-        <tr *ngFor="let row of table.body; let r = index">
-          <!--Row header cell-->
-          <th
-            (click)="clickRow(r)"
-            (contextmenu)="showTbodyMenu($event, r)"
-            (mouseenter)="activeTbodyIndex = r"
-            (mouseleave)="activeTbodyIndex = -1"
-          >
-            {{ r + 1 }}
-          </th>
-          <!--Table data cell-->
-          <td
-            [id]="cell.id"
-            *ngFor="let cell of row; let c = index; trackBy: trackByCell"
-            [class.focus]="cell === activatedCell"
-            [class.sel]="range?.includes(cell.row, cell.col)"
-            nssContentEditable
-            [content]="cell.value"
-            (contentChange)="updateValue(table, cell, $event)"
-            (focus)="focus($event)"
-            (blur)="blur($event)"
-            (mousedown)="cellMouseUp($event, cell)"
-            [attr.contenteditable]="cell.editable"
-          ></td>
-        </tr>
+      <!--Table rows-->
+        @for (row of table.body; track row; let r = $index) {
+          <tr>
+            <!--Row header cell-->
+            <th
+              (click)="clickRow(r)"
+              (contextmenu)="showTbodyMenu($event, r)"
+              (mouseenter)="activeTbodyIndex = r"
+              (mouseleave)="activeTbodyIndex = -1"
+            >
+              {{ r + 1 }}
+            </th>
+            <!--Table data cell-->
+            @for (cell of row; track cell.id; let c = $index) {
+              <td
+                [id]="cell.id"
+                [class.focus]="cell === activatedCell"
+                [class.sel]="range?.includes(cell.row, cell.col)"
+                nssContentEditable
+                [content]="cell.value"
+                (contentChange)="updateValue(table, cell, $event)"
+                (focus)="focus($event)"
+                (blur)="blur($event)"
+                (mousedown)="cellMouseUp($event, cell)"
+                [attr.contenteditable]="cell.editable"
+              ></td>
+            }
+          </tr>
+        }
         <!--New data row, click to increase row size-->
-        <tr *ngIf="table.canInsertRows">
-          <th>*</th>
-          <td
-            *ngFor="let _ of [].constructor(table.colCount); let i = index"
-            (click)="newRow(i)"
-          ></td>
-        </tr>
+        @if (table.canInsertRows) {
+          <tr>
+            <th>*</th>
+            @for (_ of [].constructor(table.colCount); track $index; let i = $index) {
+              <td
+                (click)="newRow(i)"
+              ></td>
+            }
+          </tr>
+        }
       </tbody>
     </table>
   </div>

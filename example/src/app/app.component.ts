@@ -3,6 +3,7 @@ import { ColumnOptions } from 'ngx-spreadsheet';
 
 @Component({
   selector: 'app-root',
+  standalone: false,
   template: `
     <div class="gh"></div>
     <h1>

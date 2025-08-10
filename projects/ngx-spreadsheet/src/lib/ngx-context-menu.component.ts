@@ -1,14 +1,12 @@
 import {
-  Component,
-  ContentChildren,
+  Component, contentChildren,
   ElementRef,
   EventEmitter,
   HostListener,
   Output,
-  QueryList,
-  ViewChild,
+  viewChild,
 } from '@angular/core';
-import { NgxContextMenuItemComponent } from './ngx-context-menu-item.component';
+import {NgxContextMenuItemComponent} from './ngx-context-menu-item.component';
 
 @Component({
   selector: 'ngx-context-menu',
@@ -16,11 +14,9 @@ import { NgxContextMenuItemComponent } from './ngx-context-menu-item.component';
   styleUrls: ['./ngx-context-menu.component.scss'],
 })
 export class NgxContextMenuComponent {
-  @ViewChild('menu', { static: true })
-  menuElementRef!: ElementRef<HTMLElement>;
+  menuElementRef = viewChild.required('menu', {read: ElementRef});
 
-  @ContentChildren(NgxContextMenuItemComponent)
-  itemTemplates!: QueryList<NgxContextMenuItemComponent>;
+  itemTemplates = contentChildren(NgxContextMenuItemComponent);
 
   @Output()
   closed = new EventEmitter();
@@ -50,7 +46,7 @@ export class NgxContextMenuComponent {
   }
 
   private get menuElement(): HTMLElement {
-    return this.menuElementRef.nativeElement;
+    return this.menuElementRef().nativeElement;
   }
 
   private get menuStyle(): CSSStyleDeclaration {

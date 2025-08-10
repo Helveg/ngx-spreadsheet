@@ -3,21 +3,23 @@ import {
   EventEmitter,
   HostListener,
   inject,
-  Injector,
-  Input,
+  Injector, input,
+  output,
   Output,
-  runInInjectionContext,
-  ViewChild,
+  runInInjectionContext, viewChild,
 } from '@angular/core';
-import { NgxContextMenuComponent } from './ngx-context-menu.component';
-import { Subjectize } from 'subjectize';
-import { merge, Observable, ReplaySubject } from 'rxjs';
-import { distinctUntilChanged, map, scan } from 'rxjs/operators';
-import { csvToArray } from './csv-converter';
-import { Anchor, Cell, Range, Table } from './model';
-import { ColumnOptions, SettableTableOptions } from './model/table';
-import { NSS_I18N } from './providers';
-import { deepmerge } from 'deepmerge-ts';
+import {NgxContextMenuComponent} from './ngx-context-menu.component';
+import {merge, Observable} from 'rxjs';
+import {distinctUntilChanged, map, scan} from 'rxjs/operators';
+import {csvToArray} from './csv-converter';
+import {Anchor, Cell, Range, Table} from './model';
+import {ColumnOptions, SettableTableOptions} from './model/table';
+import {NSS_I18N} from './providers';
+import {deepmerge} from 'deepmerge-ts';
+import {toObservable} from "@angular/core/rxjs-interop";
+import {LetDirective} from "@ngrx/component";
+import {ContentEditableDirective} from "./content-editable.directive";
+import {NgxContextMenuItemComponent} from "./ngx-context-menu-item.component";
 
 function setPipe<K extends SettableTableOptions>(
   obs$: Observable<Table[K]>,
@@ -35,6 +37,12 @@ function setPipe<K extends SettableTableOptions>(
   selector: 'ngx-spreadsheet',
   templateUrl: './ngx-spreadsheet.component.html',
   styleUrls: ['./ngx-spreadsheet.component.scss'],
+  imports: [
+    LetDirective,
+    ContentEditableDirective,
+    NgxContextMenuComponent,
+    NgxContextMenuItemComponent
+  ]
 })
 export class NgxSpreadsheetComponent {
   private readonly injector = inject(Injector);
@@ -47,24 +55,24 @@ export class NgxSpreadsheetComponent {
       INSERT_ROW_BELOW: 'Insert row below',
       INSERT_ROW_ABOVE: 'Insert row above',
     },
-    inject(NSS_I18N, { optional: true }) ?? {},
+    inject(NSS_I18N, {optional: true}) ?? {},
   );
-  @ViewChild('theadMenu') theadContextMenu!: NgxContextMenuComponent;
-  @ViewChild('tbodyMenu') tbodyContextMenu!: NgxContextMenuComponent;
+  theadContextMenu = viewChild<NgxContextMenuComponent>('theadMenu');
+  tbodyContextMenu = viewChild<NgxContextMenuComponent>('tbodyMenu');
 
-  @Input() data: any[][] | null = null;
-  @Output() dataChanged = new EventEmitter<any[][]>();
-  @Input() rows: number | null = null;
-  @Input() cols: number | null = null;
-  @Input() columns: ColumnOptions[] | null = null;
-  @Input() canInsertCols: boolean | null = null;
-  @Input() canInsertRows: boolean | null = null;
-  @Subjectize('data') data$ = new ReplaySubject<any[][]>(1);
-  @Subjectize('rows') rows$ = new ReplaySubject<number>(1);
-  @Subjectize('cols') cols$ = new ReplaySubject<number>(1);
-  @Subjectize('columns') columns$ = new ReplaySubject<ColumnOptions[]>(1);
-  @Subjectize('canInsertRows') canInsertRows$ = new ReplaySubject<boolean>(1);
-  @Subjectize('canInsertCols') canInsertCols$ = new ReplaySubject<boolean>(1);
+  data = input<any[][]>();
+  dataChanged = output<any[][]>();
+  rows = input<number>();
+  cols = input<number >();
+  columns = input<ColumnOptions[] >();
+  canInsertCols = input(false);
+  canInsertRows = input(false);
+  data$ = toObservable(this.data);
+  rows$ = toObservable(this.rows);
+  cols$ = toObservable(this.cols);
+  columns$ = toObservable(this.columns);
+  canInsertRows$ = toObservable(this.canInsertRows);
+  canInsertCols$ = toObservable(this.canInsertCols);
   /**
    * The table observable integrates all the reactive pipes into a higher order scan that
    * can mutate or replace the table reference.
@@ -73,14 +81,14 @@ export class NgxSpreadsheetComponent {
     setPipe(this.canInsertCols$, 'canInsertCols'),
     setPipe(this.canInsertRows$, 'canInsertRows'),
     // Data object reference changed, create new table based on data
-    this.data$.pipe(map((data) => (table: Table) => table.recreate({ data }))),
+    this.data$.pipe(map((data) => (table: Table) => table.recreate({data}))),
     // Row input changed, resize table
-    this.rows$.pipe(map((rows) => (table: Table) => table.resize({ rows }))),
+    this.rows$.pipe(map((rows) => (table: Table) => table.resize({rows}))),
     // Col input changed, resize table
-    this.cols$.pipe(map((cols) => (table: Table) => table.resize({ cols }))),
+    this.cols$.pipe(map((cols) => (table: Table) => table.resize({cols}))),
     // Columns changed, recreate table
     this.columns$.pipe(
-      map((columns) => (table: Table) => table.recreate({ columns })),
+      map((columns) => (table: Table) => table.recreate({columns})),
     ),
   ).pipe(
     scan(
@@ -104,7 +112,7 @@ export class NgxSpreadsheetComponent {
 
   @HostListener('mousedown', ['$event'])
   private onMouseDown(ev: MouseEvent): void {
-    const { row, col, valid } = this.getPositionFromId(ev.target);
+    const {row, col, valid} = this.getPositionFromId(ev.target);
     if (!valid) {
       return;
     }
@@ -121,7 +129,7 @@ export class NgxSpreadsheetComponent {
     }
     const self = this.getPositionFromId(ev.target);
     if (self.valid) {
-      const range = Range.marge({ r: self.row, c: self.col }, this.anchor);
+      const range = Range.marge({r: self.row, c: self.col}, this.anchor);
       if (!this.range?.equals(range)) {
         this.range = range;
       }
@@ -133,7 +141,7 @@ export class NgxSpreadsheetComponent {
     if (ev.shiftKey && this.anchor) {
       const self = this.getPositionFromId(ev.target);
       if (self.valid) {
-        const range = Range.marge({ r: self.row, c: self.col }, this.anchor);
+        const range = Range.marge({r: self.row, c: self.col}, this.anchor);
         if (!this.range?.equals(range)) {
           this.range = range;
         }
@@ -151,18 +159,18 @@ export class NgxSpreadsheetComponent {
     }
 
     if (!this.anchor && ev.shiftKey && this.activatedCell) {
-      const { row, col } = this.activatedCell;
+      const {row, col} = this.activatedCell;
       this.anchor = new Anchor(row, col);
     }
 
     if (key === 'enter' && this.activatedCell) {
-      const { row, col, editable } = this.activatedCell;
+      const {row, col, editable} = this.activatedCell;
       ev.preventDefault();
       this.moveTo(row + 1, col, false);
     } else if (key === 'tab' && this.activatedCell) {
       ev.preventDefault();
-      const { rowCount, colCount } = this.table;
-      const { row, col, editable } = this.activatedCell;
+      const {rowCount, colCount} = this.table;
+      const {row, col, editable} = this.activatedCell;
       const next = ev.shiftKey ? col - 1 : col + 1;
       if (next < 0 && row > 0) {
         this.moveTo(row - 1, colCount - 1, false);
@@ -210,7 +218,7 @@ export class NgxSpreadsheetComponent {
     if (!ev.shiftKey) {
       this.anchor = null;
     }
-    const { row, col } = this.activatedCell;
+    const {row, col} = this.activatedCell;
     switch (ev.key.toLowerCase()) {
       case 'arrowup':
         this.moveTo(row - 1, col, ev.shiftKey);
@@ -283,15 +291,15 @@ export class NgxSpreadsheetComponent {
 
   showTheadMenu(ev: MouseEvent, index: number) {
     ev.stopPropagation();
-    this.theadContextMenu.show(ev, index);
-    // Return false to prevent browser from opening its own context menu on top
+    this.theadContextMenu()?.show(ev, index);
+    // Return false to prevent the browser from opening its own context menu on top
     return false;
   }
 
   showTbodyMenu(ev: MouseEvent, index: number) {
     ev.stopPropagation();
-    this.tbodyContextMenu.show(ev, index);
-    // Return false to prevent browser from opening its own context menu on top
+    this.tbodyContextMenu()?.show(ev, index);
+    // Return false to prevent the browser from opening its own context menu on top
     return false;
   }
 
@@ -299,7 +307,7 @@ export class NgxSpreadsheetComponent {
     if (!this.table) {
       return;
     }
-    const { rowCount, colCount } = this.table;
+    const {rowCount, colCount} = this.table;
     const resize: { rows?: number; cols?: number } = {};
     if (rowCount <= row && this.table.canInsertRows) {
       resize.rows = row + 1;
@@ -308,7 +316,7 @@ export class NgxSpreadsheetComponent {
       resize.cols = col + 1;
     }
     this.table.resize(resize);
-    const { body } = this.table;
+    const {body} = this.table;
     if (row >= 0 && row < body.length) {
       const cols = body[row];
       if (col >= 0 && col < cols.length) {
@@ -320,7 +328,7 @@ export class NgxSpreadsheetComponent {
           }
         });
         if (shiftKey && this.range && this.anchor) {
-          this.range = Range.marge(this.anchor, { r: row, c: col });
+          this.range = Range.marge(this.anchor, {r: row, c: col});
         } else {
           this.range = Range.of(cell.row, cell.col);
         }
@@ -339,7 +347,7 @@ export class NgxSpreadsheetComponent {
   }
 
   private findCellByEventTarget(target: EventTarget | null): Cell | null {
-    const { row, col, valid } = this.getPositionFromId(target);
+    const {row, col, valid} = this.getPositionFromId(target);
     return valid ? this.table?.findCell(row, col) || null : null;
   }
 
@@ -350,12 +358,12 @@ export class NgxSpreadsheetComponent {
   } {
     const element = target as HTMLTableCellElement;
     if (!this.table || !element?.id?.match(/(\w+)-(\d+)-(\d+)/)) {
-      return { row: NaN, col: NaN, valid: false };
+      return {row: NaN, col: NaN, valid: false};
     }
     const valid = RegExp.$1 === this.table.id;
     const row = parseInt(RegExp.$2 || '', 10);
     const col = parseInt(RegExp.$3 || '', 10);
-    return { row, col, valid };
+    return {row, col, valid};
   }
 
   private copy(): void {
@@ -386,7 +394,7 @@ export class NgxSpreadsheetComponent {
     if (!this.table || !this.range) {
       return;
     }
-    const { r1, c1, r2, c2 } = this.range;
+    const {r1, c1, r2, c2} = this.range;
     navigator.clipboard.readText().then((data) => {
       const ar = csvToArray(data);
       if (!ar.length) {
@@ -428,7 +436,7 @@ export class NgxSpreadsheetComponent {
     if (!this.table || !this.range) {
       return;
     }
-    const { r1, c1, r2, c2 } = this.range;
+    const {r1, c1, r2, c2} = this.range;
     for (let r = r1; r <= r2; r++) {
       for (let c = c1; c <= c2; c++) {
         const cell = this.table.findCell(r, c);
@@ -460,7 +468,7 @@ export class NgxSpreadsheetComponent {
 
   newRow(col: number) {
     if (!this.table) return;
-    this.table.resize({ rows: this.table.rowCount + 1 });
+    this.table.resize({rows: this.table.rowCount + 1});
     this.activatedCell = this.table.findCell(this.table.rowCount - 1, col);
     this.range = new Range(
       this.table.rowCount - 1,
