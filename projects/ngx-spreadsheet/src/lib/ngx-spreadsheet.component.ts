@@ -3,7 +3,7 @@ import {
   EventEmitter,
   HostListener,
   inject,
-  Injector, input,
+  Injector, input, model,
   output,
   Output,
   runInInjectionContext, viewChild,
@@ -60,13 +60,13 @@ export class NgxSpreadsheetComponent {
   theadContextMenu = viewChild<NgxContextMenuComponent>('theadMenu');
   tbodyContextMenu = viewChild<NgxContextMenuComponent>('tbodyMenu');
 
-  data = input<any[][]>();
+  data = model<any[][]>();
   dataChanged = output<any[][]>();
-  rows = input<number>();
-  cols = input<number >();
-  columns = input<ColumnOptions[] >();
-  canInsertCols = input(false);
-  canInsertRows = input(false);
+  rows = model<number>();
+  cols = model<number >();
+  columns = model<ColumnOptions[] >();
+  canInsertCols = model(false);
+  canInsertRows = model(false);
   data$ = toObservable(this.data);
   rows$ = toObservable(this.rows);
   cols$ = toObservable(this.cols);
